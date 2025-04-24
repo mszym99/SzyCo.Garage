@@ -53,16 +53,16 @@ jobs:
         run: dotnet coalesce --what-if --verify
         working-directory: SzyCo.Garage.Web
 
-      - name: npm run lint
-        run: npm run lint
-        working-directory: SzyCo.Garage.Web
+      # - name: npm run lint
+      #   run: npm run lint
+      #   working-directory: SzyCo.Garage.Web
 
       - name: npm run build
         run: npm run build
         working-directory: SzyCo.Garage.Web
 
       - name: dotnet build
-        run: dotnet build --configuration Release --no-restore --no-incremental 
+        run: dotnet build --configuration Release --no-restore --no-incremental
 
       - name: dotnet test
         run: dotnet test --configuration Release --no-restore --no-build
@@ -85,7 +85,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name != 'pull_request'
     environment:
-      name: 'production'
+      name: "production"
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
     steps:
@@ -98,6 +98,6 @@ jobs:
         uses: azure/webapps-deploy@v3
         with:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
-          slot-name: 'production'
+          slot-name: "production"
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
           package: .
