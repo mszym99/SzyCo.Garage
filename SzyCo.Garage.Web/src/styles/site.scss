@@ -1,0 +1,67 @@
+a {
+  text-decoration: none;
+}
+
+// Vuetify3 lost the padding for ul/ol that Vuetify2 had. Restore it.
+.v-application {
+
+  ul,
+  ol {
+    padding-left: 24px;
+  }
+}
+
+// Details under inputs are bottom-aligned by default. Undo that.
+.v-input__details {
+  align-items: normal;
+  padding-top: 3px;
+  overflow: visible;
+}
+
+.v-icon {
+  // Vuetify v-icon expects to be inline-flex,
+  // but fontawesome defaults to inline-block through this var.
+  // Without setting this, icon appearance can vary with CSS load order
+  --fa-display: inline-flex;
+}
+
+// Visually distinguish readonly inputs
+.v-input--readonly {
+
+  .v-switch__track,
+  .v-switch__thumb {
+    border: 1px dashed rgba(var(--v-theme-on-surface), 0.7);
+  }
+
+  .v-field__outline__start,
+  .v-field__outline__end,
+  .v-field__outline__notch::before,
+  .v-field__outline__notch::after {
+    border-style: dashed;
+  }
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.6rem 1.2rem;
+  font-size: 1rem;
+  font-weight: 500;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  background-color: #3b82f6; // Tailwind blue-500
+  color: white;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: #2563eb; // Tailwind blue-600
+  }
+
+  &:disabled {
+    background-color: #cbd5e1;
+    color: #64748b;
+    cursor: not-allowed;
+  }
+}

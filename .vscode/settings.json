@@ -1,0 +1,9 @@
+{
+  "typescript.tsdk": "SzyCo.Garage.Web\\node_modules\\typescript\\lib",
+  "dotnet.defaultSolution": "SzyCo.Garage.sln",
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "cSpell.words": ["Vite", "unplugin", "iconsets", "viewmodels", "composables"]
+}

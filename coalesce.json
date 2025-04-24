@@ -1,0 +1,16 @@
+{
+  "webProject": {
+    "projectFile": "./SzyCo.Garage.Web/SzyCo.Garage.Web.csproj"
+  },
+  "dataProject": {
+    "projectFile": "./SzyCo.Garage.Data/SzyCo.Garage.Data.csproj"
+  },
+
+  "rootGenerator": "Vue",
+
+  "generatorConfig": {
+    "Scripts": {
+      "targetDirectory": "../src"
+    }
+  }
+}

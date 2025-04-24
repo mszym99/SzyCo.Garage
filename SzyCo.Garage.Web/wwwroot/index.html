@@ -1,0 +1,118 @@
+<!doctype html>
+<html>
+  <head>
+    <script>BUILD_DATE = new Date('2025-04-24T01:23:09.839Z');</script>
+
+    <script>
+    // This code injected by coalesce-vue's createAspNetCoreHmrPlugin.
+    // It can be disabled with setting 'offerConfigurationSuggestions: false'.
+    // Detect if requests to the vite server are failing, and offer suggestions.
+    
+    if ("https://localhost:49831" == window.location.origin) {
+      alert("Coalesce/Vite: You seem to be hitting the vite server directly, rather than the ASP.NET Core server. API calls probably won't work. \n\nIf you were only hitting this URL to add a TLS exception, disregard and just close this tab.")
+    }
+
+    fetch("https://localhost:49831/vite_hmr/", {
+      method: 'HEAD',
+      cache: 'no-cache',
+    }).catch((e) => {
+      // The only reason that fetch throws is because of network errors,
+      // so no need to look carefully at the message.
+
+      var messages = [];
+      if (window.location.protocol == "https:") {
+        if (navigator.userAgent?.includes("Firefox") && !navigator.userAgent?.includes("Mobile")) {
+          messages.push(`This might be a <b>Firefox-specific</b> TLS error. Firefox does not use the system cert store by default. To resolve this, navigate to <code>about:config</code> and enable setting 
+          '<code>security.enterprise_roots.enabled</code>' 
+          (<a href="https://learn.microsoft.com/en-us/aspnet/core/security/enforcing-ssl?view=aspnetcore-7.0&tabs=visual-studio#configure-trust-of-https-certificate-using-firefox-browser">MS Docs</a>).`)
+        }
+      
+        messages.push(`The TLS certificate of <code>localhost:49831</code> might not be trusted. Open <a href="https://localhost:49831/vite_hmr/" target=_blank>this link</a> in a new tab and add an additional certificate exception if prompted. This is especially useful if this browser is on a different device than the dev server.`)
+      }
+
+      const isSameHostname = "localhost" == window.location.hostname;
+      messages[!isSameHostname ? 'unshift' : 'push'](`If the dev server is not routable from this browser using URL <code>https://localhost:49831</code>, pass either: <ul><li>  <code>{host: 'network-hostname-or-ip-of-dev-server'}</code> (better)</li> <li> <code>{assetBypass: false}</code> (slower)</li></ul> to <code>createAspNetCoreHmrPlugin()</code> in vite.config.ts. Don't commit this change because it will break other developers.`)
+
+      messages.push("You launched locally without <code>UseViteDevelopmentServer()</code>, or didn't build for production before deploying, and are therefore operating off a stale <code>C:&#92;Users&#92;MSzym&#92;Desktop&#92;repos&#92;SzyCo.Garage&#92;SzyCo.Garage.Web&#92;wwwroot&#92;index.html</code> file. Or, the vite server crashed.")
+
+      document.body.insertAdjacentHTML("beforeend", `
+      <div style="height: 100vh;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        background: #333;"
+      >
+      <div style="
+        margin: 30px auto;
+        max-width: 700px;
+        font-family: sans-serif;
+        padding: 16px;
+        font-size: 16px;
+        background: #680b0b;
+        z-index: 10000;
+        color: #cfcfcf;"
+      >
+        <b>Coalesce/Vite</b>: Requests to the Vite server (https://localhost:49831) are failing due to network errors. 
+        <br>
+        <br>
+        Consider the following potential solutions:
+        <ol>${messages.map(m => '<li style="padding-bottom: 16px">' + m + '</li>').join('')}</ol>
+        </div></div>`)
+    })
+          </script>
+
+    <script type="module" src="https://localhost:49831/vite_hmr/@vite/client"></script>
+
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <link rel="shortcut icon" href="https://localhost:49831/vite_hmr/favicon.ico" />
+    <title>MyAppName</title>
+  </head>
+  <body>
+    <noscript>
+      <strong>
+        We're sorry, but this application doesn't work properly without
+        JavaScript enabled. Please enable it to continue.
+      </strong>
+    </noscript>
+    <div id="app">
+      <script>
+        // Respect dark theme so the user isn't blasted with a flash of white as the app loads.
+        if (
+          localStorage.getItem("theme") === "dark" ||
+          (localStorage.getItem("theme") == null &&
+            window.matchMedia("(prefers-color-scheme: dark)").matches)
+        ) {
+          document.currentScript.insertAdjacentHTML(
+            "afterend",
+            `<style> :root { color-scheme: dark; } </style>`
+          );
+        }
+      </script>
+      <style>
+        #loading {
+          margin: auto;
+          margin-top: 10vh;
+          display: block;
+          width: 50px;
+          height: 50px;
+          border: 3px solid
+            light-dark(rgba(0, 0, 0, 0.3), rgba(255, 255, 255, 0.3));
+          border-radius: 50%;
+          border-top-color: light-dark(black, white);
+          animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+          to {
+            transform: rotate(360deg);
+          }
+        }
+      </style>
+      <div id="loading"></div>
+    </div>
+    <script type="module" src="https://localhost:49831/vite_hmr/src/main.ts"></script>
+  </body>
+</html>
