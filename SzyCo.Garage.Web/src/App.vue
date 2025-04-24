@@ -47,11 +47,7 @@
     </v-app-bar>
     <v-navigation-drawer v-model="drawer">
       <v-list>
-        <v-list-item
-          to="/"
-          prepend-icon="fa fa-palette"
-          title="Garage"
-        />
+        <v-list-item to="/" prepend-icon="fa fa-palette" title="Garage" />
         <v-divider></v-divider>
         <v-divider></v-divider>
         <v-list-item

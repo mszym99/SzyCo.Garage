@@ -7,13 +7,9 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
-    CarCard: typeof import('../components/CarTable.vue')['default']
     CarForm: typeof import('./../components/CarForm.vue')['default']
     CarHero: typeof import('./../components/CarHero.vue')['default']
     CarTable: typeof import('./../components/CarTable.vue')['default']
-    CDisplay: typeof import('coalesce-vue-vuetify3')['CDisplay']
-    CInput: typeof import('coalesce-vue-vuetify3')['CInput']
-    CLoaderStatus: typeof import('coalesce-vue-vuetify3')['CLoaderStatus']
     HelloWorld: typeof import('./../components/HelloWorld.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
