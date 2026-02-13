@@ -14,8 +14,8 @@ steps:
   - task: UseDotNet@2
     inputs:
       packageType: "sdk"
-      version: "8.x"
-      includePreviewVersions: true
+      version: "9.x"
+      includePreviewVersions: false
       performMultiLevelLookup: true
 
   - task: UseNode@1

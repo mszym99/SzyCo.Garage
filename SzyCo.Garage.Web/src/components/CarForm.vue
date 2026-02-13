@@ -1,6 +1,6 @@
 <template>
   <v-dialog v-model="dialog" max-width="500px">
-    <template v-slot:activator="{ props: activatorProps }">
+    <template #activator="{ props: activatorProps }">
       <v-btn
         v-bind="activatorProps"
         color="surface-variant"
@@ -12,7 +12,7 @@
       <v-card-title>Add New Car</v-card-title>
 
       <v-card-text>
-        <v-form v-model="valid" ref="form" lazy-validation>
+        <v-form ref="form" v-model="valid" lazy-validation>
           <v-text-field
             v-model="car.Year"
             label="Year"

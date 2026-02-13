@@ -12,8 +12,8 @@ using SzyCo.Garage.Data;
 namespace SzyCo.Garage.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250329035926_test")]
-    partial class test
+    [Migration("20250329035926_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

@@ -1,17 +1,17 @@
 <template>
   <v-container class="pa-6">
     <v-btn
-      @click="goBack"
       prepend-icon="mdi-arrow-left"
       class="mb-4"
       color="primary"
       variant="outlined"
+      @click="goBack"
     >
       Back to Car List
     </v-btn>
 
     <h2 class="text-h5 mb-4">Car Details</h2>
-    <CarHero :carId="carId" />
+    <CarHero :car-id="carId" />
   </v-container>
 </template>
 

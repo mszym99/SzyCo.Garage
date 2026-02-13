@@ -14,9 +14,9 @@ const router = createRouter({
       component: () => import("./views/Car.vue"),
     },
     {
-      path: '/car/:id',
-      name: 'car',
-      component: () => import('@/views/CarMain.vue')
+      path: "/car/:id",
+      name: "car",
+      component: () => import("@/views/CarMain.vue"),
     },
     {
       path: "/admin",
@@ -65,9 +65,9 @@ const router = createRouter({
  */
 function titledAdminPage<
   T extends
-  | typeof CAdminTablePage
-  | typeof CAdminEditorPage
-  | typeof CAdminAuditLogPage,
+    | typeof CAdminTablePage
+    | typeof CAdminEditorPage
+    | typeof CAdminAuditLogPage,
 >(component: T) {
   return defineComponent({
     setup() {
