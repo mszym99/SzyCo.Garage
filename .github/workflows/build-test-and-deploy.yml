@@ -40,9 +40,8 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      # Add this if dotnet coalesce is installed as a local .NET tool
-      # and you have .config/dotnet-tools.json committed.
       - name: Restore .NET tools
+        if: hashFiles('.config/dotnet-tools.json') != ''
         run: dotnet tool restore
 
       - name: Install npm packages
@@ -56,7 +55,6 @@ jobs:
         run: dotnet coalesce --what-if --verify
         working-directory: ${{ env.WEB_PROJECT_PATH }}
 
-      # Enable this once lint is clean and reliable.
       # - name: Lint frontend
       #   run: npm run lint
       #   working-directory: ${{ env.WEB_PROJECT_PATH }}
@@ -74,12 +72,22 @@ jobs:
       - name: Publish web app
         run: dotnet publish ${{ github.workspace }}/${{ env.WEB_PROJECT_PATH }}/SzyCo.Garage.Web.csproj --configuration Release --output ${{ env.PUBLISH_DIR }} --no-restore --no-build
 
+      - name: Verify publish output
+        if: github.event_name != 'pull_request'
+        run: ls -la "${{ env.PUBLISH_DIR }}"
+
+      - name: Zip published app
+        if: github.event_name != 'pull_request'
+        run: |
+          cd "${{ env.PUBLISH_DIR }}"
+          zip -r "${{ github.workspace }}/web-app.zip" .
+
       - name: Upload artifact for deployment
         if: github.event_name != 'pull_request'
         uses: actions/upload-artifact@v4
         with:
           name: web-app
-          path: ${{ env.PUBLISH_DIR }}
+          path: ${{ github.workspace }}/web-app.zip
           if-no-files-found: error
 
   deploy-production:
@@ -97,7 +105,12 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: web-app
-          path: ./web-app
+          path: ./deployment-package
+
+      - name: Verify deployment package
+        run: |
+          ls -la ./deployment-package
+          unzip -l ./deployment-package/web-app.zip | head -50
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
@@ -105,4 +118,4 @@ jobs:
         with:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-          package: ./web-app
+          package: ./deployment-package/web-app.zip
