@@ -35,12 +35,7 @@
             required
           />
 
-          <div
-            v-if="((eventTypeOptions.find(option => option.eventTypeDefinitionId === eventForm.EventTypeId)?.code
-              ?? eventTypeOptions.find(option => option.eventTypeDefinitionId === eventForm.EventTypeId)?.slug
-              ?? eventTypeOptions.find(option => option.eventTypeDefinitionId === eventForm.EventTypeId)?.name
-              ?? '').toString().toLowerCase()) === 'replacement'"
-          >
+          <div v-if="isReplacementEventType">
             <v-text-field
               v-model="replacementFields.PartName"
               label="Part Name"
@@ -118,6 +113,10 @@ const selectedEventTypeName = computed(() => {
   return found?.name ?? null;
 });
 
+const isReplacementEventType = computed(
+  () => selectedEventTypeName.value?.toLowerCase() === "replacement",
+);
+
 const props = defineProps<{
   carList: CarListViewModel;
 }>();
@@ -137,7 +136,7 @@ const saveEvent = async () => {
 
   let jsonData: Record<string, string> = {};
 
-  if (selectedEventTypeName.value === "Replacement") {
+  if (isReplacementEventType.value) {
     jsonData = {
       partName: replacementFields.value.PartName,
       reason: replacementFields.value.Reason,
