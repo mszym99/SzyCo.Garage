@@ -45,6 +45,10 @@ bld/
 .idea/
 *.sln.iml
 
+# Uncomment if you have tasks that create the project's static files in wwwroot
+# For Vite builds, exclude generated assets but keep index.html
+**/wwwroot/assets/
+
 # Visual Studio 2017 auto generated files
 Generated\ Files/
 

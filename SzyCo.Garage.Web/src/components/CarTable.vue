@@ -7,16 +7,16 @@
     hover
     @click:row="goToCar"
   >
-    <template #item.make="{ item }">
+    <template #[`item.make`]="{ item }">
       {{ item.make }}
     </template>
-    <template #item.model="{ item }">
+    <template #[`item.model`]="{ item }">
       {{ item.model }}
     </template>
-    <template #item.year="{ item }">
+    <template #[`item.year`]="{ item }">
       {{ item.year }}
     </template>
-    <template #item.color="{ item }">
+    <template #[`item.color`]="{ item }">
       {{ item.color || "No description provided." }}
     </template>
   </v-data-table>

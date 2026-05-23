@@ -1,6 +1,12 @@
 <template>
   <v-container class="pa-6">
-    <v-btn @click="goBack" class="mb-4" color="primary" variant="outlined">
+    <v-btn
+      prepend-icon="mdi-arrow-left"
+      class="mb-4"
+      color="primary"
+      variant="outlined"
+      @click="goBack"
+    >
       Back to Car List
     </v-btn>
 
@@ -10,7 +16,7 @@
     >
 
     <h2 class="text-h5 mb-4">Car Details</h2>
-    <CarHero :carId="carId" />
+    <CarHero :car-id="carId" />
 
     <!-- Edit Car Dialog -->
     <v-dialog v-model="editDialog" width="500">

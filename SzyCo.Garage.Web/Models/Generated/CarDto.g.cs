@@ -76,6 +76,7 @@ namespace SzyCo.Garage.Web.Models
 
             var entity = new SzyCo.Garage.Data.Models.Car()
             {
+                UserId = UserId,
                 Year = (Year ?? default),
                 Make = Make,
                 Model = Model,
@@ -84,7 +85,6 @@ namespace SzyCo.Garage.Web.Models
 
             if (OnUpdate(entity, context)) return entity;
             if (ShouldMapTo(nameof(CarId))) entity.CarId = (CarId ?? entity.CarId);
-            if (ShouldMapTo(nameof(UserId))) entity.UserId = UserId;
 
             return entity;
         }

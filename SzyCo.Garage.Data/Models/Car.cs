@@ -7,10 +7,10 @@ public class Car
 
     // Foreign key to AspNetUsers.Id
     [ForeignKey(nameof(User))]
-    public string UserId { get; set; }
+    public required string UserId { get; set; }
 
     // Navigation property to the Identity user
-    public User User { get; set; }
+    public User User { get; set; } = null!;
 
     public required int Year { get; set; }
     public required string Make { get; set; }
