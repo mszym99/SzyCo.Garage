@@ -8,7 +8,6 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Logging.Console;
 using Microsoft.OpenApi.Models;
 using Scalar.AspNetCore;
-using System.Security.Claims;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
@@ -16,7 +15,6 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.Mvc;
 using SzyCo.Garage.Data.Communication;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 
 var builder = WebApplication.CreateBuilder(new WebApplicationOptions
 {
@@ -38,8 +36,6 @@ builder.Configuration
 #region Configure Services
 
 var services = builder.Services;
-
-
 
 services.AddDbContext<AppDbContext>(options => options
     .UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"), opt => opt
@@ -73,7 +69,6 @@ services.AddSwaggerGen(c =>
     c.AddCoalesce();
     c.SwaggerDoc("current", new OpenApiInfo { Title = "Current API", Version = "current" });
 });
-
 
 services.AddScoped<SecurityService>();
 
@@ -153,7 +148,7 @@ using (var scope = app.Services.CreateScope())
     // Run database migrations.
     using var db = serviceScope.GetRequiredService<AppDbContext>();
     db.Database.SetCommandTimeout(TimeSpan.FromMinutes(10));
-	db.Database.Migrate();
+    db.Database.Migrate();
     ActivatorUtilities.GetServiceOrCreateInstance<DatabaseSeeder>(serviceScope).Seed();
 }
 

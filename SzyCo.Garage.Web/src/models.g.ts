@@ -130,6 +130,35 @@ export namespace Car {
 }
 
 
+export interface Event extends Model<typeof metadata.Event> {
+  id: number | null
+  carId: number | null
+  eventTypeId: number | null
+  jsonData: string | null
+  createDate: Date | null
+  modifiedDate: Date | null
+}
+export class Event {
+  
+  /** Mutates the input object and its descendents into a valid Event implementation. */
+  static convert(data?: Partial<Event>): Event {
+    return convertToModel(data || {}, metadata.Event) 
+  }
+  
+  /** Maps the input object and its descendents to a new, valid Event implementation. */
+  static map(data?: Partial<Event>): Event {
+    return mapToModel(data || {}, metadata.Event) 
+  }
+  
+  static [Symbol.hasInstance](x: any) { return x?.$metadata === metadata.Event; }
+  
+  /** Instantiate a new Event, optionally basing it on the given data. */
+  constructor(data?: Partial<Event> | {[k: string]: any}) {
+    Object.assign(this, Event.map(data || {}));
+  }
+}
+
+
 export interface Role extends Model<typeof metadata.Role> {
   name: string | null
   permissions: Permission[] | null
@@ -308,6 +337,7 @@ declare module "coalesce-vue/lib/model" {
     AuditLog: AuditLog
     AuditLogProperty: AuditLogProperty
     Car: Car
+    Event: Event
     Role: Role
     User: User
     UserInfo: UserInfo

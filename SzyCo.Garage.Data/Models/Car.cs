@@ -1,11 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using SzyCo.Garage.Data;
-using SzyCo.Garage.Data.Models;
-
-namespace SzyCo.Cars.Data.Models;
+namespace SzyCo.Garage.Data.Models;
 
 public class Car
 {

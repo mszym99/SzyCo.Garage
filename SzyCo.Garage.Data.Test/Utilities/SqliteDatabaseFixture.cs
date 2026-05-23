@@ -44,7 +44,6 @@ public class SqliteDatabaseFixture : IDisposable
     {
         var seeder = new DatabaseSeeder(db);
         seeder.Seed();
-
     }
 
     public void Dispose()
