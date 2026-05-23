@@ -56,7 +56,7 @@ namespace SzyCo.Garage.Web.Api
 
         [HttpPost("save")]
         [Consumes("application/x-www-form-urlencoded", "multipart/form-data")]
-        [Authorize]
+        [Authorize(Roles = "UserAdmin")]
         public virtual Task<ItemResult<EventTypeDefinitionResponse>> Save(
             [FromForm] EventTypeDefinitionParameter dto,
             [FromQuery] DataSourceParameters parameters,
@@ -66,7 +66,7 @@ namespace SzyCo.Garage.Web.Api
 
         [HttpPost("save")]
         [Consumes("application/json")]
-        [Authorize]
+        [Authorize(Roles = "UserAdmin")]
         public virtual Task<ItemResult<EventTypeDefinitionResponse>> SaveFromJson(
             [FromBody] EventTypeDefinitionParameter dto,
             [FromQuery] DataSourceParameters parameters,
@@ -85,7 +85,7 @@ namespace SzyCo.Garage.Web.Api
             => BulkSaveImplementation(dto, parameters, dataSource, dataSourceFactory, behaviorsFactory);
 
         [HttpPost("delete/{id}")]
-        [Authorize]
+        [Authorize(Roles = "UserAdmin")]
         public virtual Task<ItemResult<EventTypeDefinitionResponse>> Delete(
             int id,
             IBehaviors<SzyCo.Garage.Data.Models.EventTypeDefinition> behaviors,
