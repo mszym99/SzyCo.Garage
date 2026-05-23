@@ -1,5 +1,8 @@
 namespace SzyCo.Garage.Data.Models;
 
+[Create(nameof(Permission.UserAdmin))]
+[Edit(nameof(Permission.UserAdmin))]
+[Delete(nameof(Permission.UserAdmin))]
 public class EventTypeDefinition
 {
     [Key]
