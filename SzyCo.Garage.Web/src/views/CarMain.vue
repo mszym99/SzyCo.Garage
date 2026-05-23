@@ -63,9 +63,9 @@
       <v-card>
         <v-card-title>Edit Car</v-card-title>
         <v-card-text>
+          <v-text-field v-model="editCar.year" label="Year" type="number" />
           <v-text-field v-model="editCar.make" label="Make" />
           <v-text-field v-model="editCar.model" label="Model" />
-          <v-text-field v-model="editCar.year" label="Year" type="number" />
           <v-text-field v-model="editCar.color" label="Color" />
         </v-card-text>
         <v-card-actions>
