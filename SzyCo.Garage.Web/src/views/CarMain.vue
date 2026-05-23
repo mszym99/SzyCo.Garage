@@ -45,9 +45,9 @@
           <v-card-subtitle>
             {{ formatDate(event.createDate) }}
           </v-card-subtitle>
-          <v-card-text v-if="parseJsonData(event.jsonData)">
+          <v-card-text v-if="getParsedEventData(event)">
             <div
-              v-for="(value, key) in parseJsonData(event.jsonData)"
+              v-for="(value, key) in getParsedEventData(event)"
               :key="String(key)"
             >
               <strong>{{ formatLabel(String(key)) }}:</strong>
@@ -112,6 +112,10 @@ const editCar = ref<CarViewModel>(new CarViewModel());
 const snackbar = ref({ show: false, message: "" });
 
 const eventList = new EventListViewModel();
+const parsedEventDataCache = new WeakMap<
+  object,
+  Record<string, string> | null
+>();
 
 function goBack() {
   router.back();
@@ -151,6 +155,18 @@ function parseJsonData(
   } catch {
     return null;
   }
+}
+
+function getParsedEventData(event: {
+  jsonData: string | null | undefined;
+}): Record<string, string> | null {
+  if (parsedEventDataCache.has(event)) {
+    return parsedEventDataCache.get(event) ?? null;
+  }
+
+  const parsedData = parseJsonData(event.jsonData);
+  parsedEventDataCache.set(event, parsedData);
+  return parsedData;
 }
 
 function formatLabel(key: string): string {
