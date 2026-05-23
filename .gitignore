@@ -369,5 +369,5 @@ dist/
 wwwroot/
 
 # Local ASP.NET Core settings (may contain connection strings/secrets)
+appsettings.json
 appsettings.*.json
-!appsettings.json
