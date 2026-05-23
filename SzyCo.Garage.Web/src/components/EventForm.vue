@@ -31,6 +31,7 @@
             item-value="eventTypeDefinitionId"
             label="Event Type"
             :loading="eventTypeList.$load.isLoading"
+            :rules="requiredRule"
             required
           />
 
