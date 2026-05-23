@@ -8,7 +8,7 @@ using System.Security.Claims;
 
 namespace SzyCo.Garage.Web.Models
 {
-    public partial class CarParameter : GeneratedParameterDto<SzyCo.Cars.Data.Models.Car>
+    public partial class CarParameter : GeneratedParameterDto<SzyCo.Garage.Data.Models.Car>
     {
         public CarParameter() { }
 
@@ -53,7 +53,7 @@ namespace SzyCo.Garage.Web.Models
         /// <summary>
         /// Map from the current DTO instance to the domain object.
         /// </summary>
-        public override void MapTo(SzyCo.Cars.Data.Models.Car entity, IMappingContext context)
+        public override void MapTo(SzyCo.Garage.Data.Models.Car entity, IMappingContext context)
         {
             var includes = context.Includes;
 
@@ -70,11 +70,11 @@ namespace SzyCo.Garage.Web.Models
         /// <summary>
         /// Map from the current DTO instance to a new instance of the domain object.
         /// </summary>
-        public override SzyCo.Cars.Data.Models.Car MapToNew(IMappingContext context)
+        public override SzyCo.Garage.Data.Models.Car MapToNew(IMappingContext context)
         {
             var includes = context.Includes;
 
-            var entity = new SzyCo.Cars.Data.Models.Car()
+            var entity = new SzyCo.Garage.Data.Models.Car()
             {
                 Year = (Year ?? default),
                 Make = Make,
@@ -90,7 +90,7 @@ namespace SzyCo.Garage.Web.Models
         }
     }
 
-    public partial class CarResponse : GeneratedResponseDto<SzyCo.Cars.Data.Models.Car>
+    public partial class CarResponse : GeneratedResponseDto<SzyCo.Garage.Data.Models.Car>
     {
         public CarResponse() { }
 
@@ -105,7 +105,7 @@ namespace SzyCo.Garage.Web.Models
         /// <summary>
         /// Map from the domain object to the properties of the current DTO instance.
         /// </summary>
-        public override void MapFrom(SzyCo.Cars.Data.Models.Car obj, IMappingContext context, IncludeTree tree = null)
+        public override void MapFrom(SzyCo.Garage.Data.Models.Car obj, IMappingContext context, IncludeTree tree = null)
         {
             if (obj == null) return;
             var includes = context.Includes;

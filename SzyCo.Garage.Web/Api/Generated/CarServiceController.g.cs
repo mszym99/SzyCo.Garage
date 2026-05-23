@@ -25,11 +25,11 @@ namespace SzyCo.Garage.Web.Api
     [ServiceFilter(typeof(IApiActionFilter))]
     public partial class CarServiceController : BaseApiController
     {
-        protected CarService Service { get; }
+        protected SzyCo.Garage.Data.Services.CarService Service { get; }
 
-        public CarServiceController(CrudContext context, CarService service) : base(context)
+        public CarServiceController(CrudContext context, SzyCo.Garage.Data.Services.CarService service) : base(context)
         {
-            GeneratedForClassViewModel = context.ReflectionRepository.GetClassViewModel<CarService>();
+            GeneratedForClassViewModel = context.ReflectionRepository.GetClassViewModel<SzyCo.Garage.Data.Services.CarService>();
             Service = service;
         }
     }
