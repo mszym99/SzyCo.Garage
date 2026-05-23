@@ -34,7 +34,12 @@
             required
           />
 
-          <div v-if="selectedEventTypeName === 'Replacement'">
+          <div
+            v-if="((eventTypeOptions.find(option => option.eventTypeDefinitionId === eventForm.EventTypeId)?.code
+              ?? eventTypeOptions.find(option => option.eventTypeDefinitionId === eventForm.EventTypeId)?.slug
+              ?? eventTypeOptions.find(option => option.eventTypeDefinitionId === eventForm.EventTypeId)?.name
+              ?? '').toString().toLowerCase()) === 'replacement'"
+          >
             <v-text-field
               v-model="replacementFields.PartName"
               label="Part Name"
