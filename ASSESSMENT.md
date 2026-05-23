@@ -1,4 +1,6 @@
-# SzyCo.Garage Repository Assessment
+# SzyCo.Garage Repository Assessment (Historical)
+
+> **Note:** This document is a point-in-time assessment from February 2026. Several items noted here have since been addressed. See the README for current project status and setup instructions.
 
 **Assessment Date:** February 13, 2026  
 **Repository:** mszym99/SzyCo.Garage  
@@ -245,15 +247,15 @@ vitest                           2.1.2   ⚠️ Has security vulnerability (see 
 | **Non-nullable warnings** | Models/Car.cs (UserId, User) | Medium | C# nullability contract violation |
 | **ESLint errors** | CarTable.vue, router.ts, CarMain.vue | Medium | Code style inconsistency |
 | **Widget sample code** | Models/Widget.cs + WidgetEdit.vue | Low | Template leftover, should remove |
-| **Empty README** | README.md | High | No setup/onboarding docs |
+| **Empty README** | README.md | ~~High~~ | ~~No setup/onboarding docs~~ **Fixed** — comprehensive README now exists |
 
 ### 4.2 Missing Documentation
 
-- ❌ No setup instructions (database connection, initial user)
-- ❌ No architecture documentation
-- ❌ No data model documentation
-- ❌ No Coalesce workflow documentation
-- ❌ No developer onboarding guide
+- ~~❌ No setup instructions (database connection, initial user)~~ **Fixed**
+- ~~❌ No architecture documentation~~ **Fixed**
+- ~~❌ No data model documentation~~ **Fixed**
+- ~~❌ No Coalesce workflow documentation~~ **Fixed**
+- ~~❌ No developer onboarding guide~~ **Fixed**
 
 ### 4.3 Test Coverage
 
@@ -368,7 +370,7 @@ Need further investigation:
 12. Publish artifacts
 
 **Issues Found:**
-- ⚠️ Pipeline uses .NET 8.x but project targets .NET 9.0
+- ~~⚠️ Pipeline uses .NET 8.x but project targets .NET 9.0~~ **Fixed** — pipeline now uses .NET 9.x
 - ✅ Coalesce verification prevents stale generated code
 - ✅ Linting and testing are enforced
 - ✅ Warnings treated as errors (good practice)
@@ -433,9 +435,9 @@ dotnet run  # or: npm run dev (for Vite HMR)
 1. ✅ Run `npm audit fix` to address security vulnerabilities
 2. ✅ Fix ESLint errors (10 errors prevent clean builds)
 3. ✅ Fix nullable reference warnings in Car.cs
-4. ✅ Update azure-pipelines.yml to use .NET 9.x
+4. ~~✅ Update azure-pipelines.yml to use .NET 9.x~~ **Done**
 5. ✅ Rename "test" migration to "InitialCreate"
-6. ✅ Write comprehensive README with setup instructions
+6. ~~✅ Write comprehensive README with setup instructions~~ **Done**
 
 ### Short Term (Technical Debt)
 1. Remove Widget sample code or document as intentional example

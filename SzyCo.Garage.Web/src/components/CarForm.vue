@@ -36,17 +36,14 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { CarViewModel, SecurityServiceViewModel } from "@/viewmodels.g";
+import { CarViewModel } from "@/viewmodels.g";
 
 const emit = defineEmits<{ saved: [] }>();
 
 const dialog = ref(false);
 const valid = ref(false);
-const ssvm = new SecurityServiceViewModel();
 
 const car = ref({
-  CarId: null as number | null,
-  UserInfoId: "",
   Year: "",
   Make: "",
   Model: "",
@@ -54,10 +51,7 @@ const car = ref({
 });
 
 const saveCar = async () => {
-  const userInfo = await ssvm.whoAmI();
   const carVM = new CarViewModel();
-  carVM.carId = car.value.CarId;
-  carVM.userId = userInfo.id;
   carVM.year = parseInt(car.value.Year);
   carVM.make = car.value.Make;
   carVM.model = car.value.Model;
@@ -66,6 +60,7 @@ const saveCar = async () => {
   try {
     await carVM.$save();
     dialog.value = false;
+    car.value = { Year: "", Make: "", Model: "", Color: "" };
     emit("saved");
   } catch (err) {
     console.error("Error saving car:", err);

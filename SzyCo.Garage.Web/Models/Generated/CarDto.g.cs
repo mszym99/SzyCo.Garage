@@ -13,7 +13,6 @@ namespace SzyCo.Garage.Web.Models
         public CarParameter() { }
 
         private int? _CarId;
-        private string _UserId;
         private int? _Year;
         private string _Make;
         private string _Model;
@@ -23,11 +22,6 @@ namespace SzyCo.Garage.Web.Models
         {
             get => _CarId;
             set { _CarId = value; Changed(nameof(CarId)); }
-        }
-        public string UserId
-        {
-            get => _UserId;
-            set { _UserId = value; Changed(nameof(UserId)); }
         }
         public int? Year
         {
@@ -60,7 +54,6 @@ namespace SzyCo.Garage.Web.Models
             if (OnUpdate(entity, context)) return;
 
             if (ShouldMapTo(nameof(CarId))) entity.CarId = (CarId ?? entity.CarId);
-            if (ShouldMapTo(nameof(UserId))) entity.UserId = UserId;
             if (ShouldMapTo(nameof(Year))) entity.Year = (Year ?? entity.Year);
             if (ShouldMapTo(nameof(Make))) entity.Make = Make;
             if (ShouldMapTo(nameof(Model))) entity.Model = Model;
@@ -76,7 +69,6 @@ namespace SzyCo.Garage.Web.Models
 
             var entity = new SzyCo.Garage.Data.Models.Car()
             {
-                UserId = UserId,
                 Year = (Year ?? default),
                 Make = Make,
                 Model = Model,
@@ -101,6 +93,7 @@ namespace SzyCo.Garage.Web.Models
         public string Model { get; set; }
         public string Color { get; set; }
         public SzyCo.Garage.Web.Models.UserResponse User { get; set; }
+        public System.Collections.Generic.ICollection<SzyCo.Garage.Web.Models.EventResponse> Events { get; set; }
 
         /// <summary>
         /// Map from the domain object to the properties of the current DTO instance.
@@ -118,6 +111,18 @@ namespace SzyCo.Garage.Web.Models
             this.Color = obj.Color;
             if (tree == null || tree[nameof(this.User)] != null)
                 this.User = obj.User.MapToDto<SzyCo.Garage.Data.Models.User, UserResponse>(context, tree?[nameof(this.User)]);
+
+            var propValEvents = obj.Events;
+            if (propValEvents != null && (tree == null || tree[nameof(this.Events)] != null))
+            {
+                this.Events = propValEvents
+                    .OrderBy(f => f.Id)
+                    .Select(f => f.MapToDto<SzyCo.Garage.Data.Models.Event, EventResponse>(context, tree?[nameof(this.Events)])).ToList();
+            }
+            else if (propValEvents == null && tree?[nameof(this.Events)] != null)
+            {
+                this.Events = new EventResponse[0];
+            }
 
         }
     }

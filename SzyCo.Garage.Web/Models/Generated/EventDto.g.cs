@@ -88,6 +88,8 @@ namespace SzyCo.Garage.Web.Models
         public string JsonData { get; set; }
         public System.DateTime? CreateDate { get; set; }
         public System.DateTime? ModifiedDate { get; set; }
+        public SzyCo.Garage.Web.Models.CarResponse Car { get; set; }
+        public SzyCo.Garage.Web.Models.EventTypeDefinitionResponse EventTypeDefinition { get; set; }
 
         /// <summary>
         /// Map from the domain object to the properties of the current DTO instance.
@@ -103,6 +105,12 @@ namespace SzyCo.Garage.Web.Models
             this.JsonData = obj.JsonData;
             this.CreateDate = obj.CreateDate;
             this.ModifiedDate = obj.ModifiedDate;
+            if (tree == null || tree[nameof(this.Car)] != null)
+                this.Car = obj.Car.MapToDto<SzyCo.Garage.Data.Models.Car, CarResponse>(context, tree?[nameof(this.Car)]);
+
+            if (tree == null || tree[nameof(this.EventTypeDefinition)] != null)
+                this.EventTypeDefinition = obj.EventTypeDefinition.MapToDto<SzyCo.Garage.Data.Models.EventTypeDefinition, EventTypeDefinitionResponse>(context, tree?[nameof(this.EventTypeDefinition)]);
+
         }
     }
 }

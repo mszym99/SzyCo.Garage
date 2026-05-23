@@ -278,9 +278,7 @@ export const Car = domain.types.Car = {
       get principalType() { return (domain.types.User as ModelType & { name: "User" }) },
       get navigationProp() { return (domain.types.Car as ModelType & { name: "Car" }).props.user as ModelReferenceNavigationProperty },
       hidden: 3 as HiddenAreas,
-      rules: {
-        required: val => (val != null && val !== '') || "User is required.",
-      }
+      dontSerialize: true,
     },
     user: {
       name: "user",
@@ -328,6 +326,22 @@ export const Car = domain.types.Car = {
         required: val => (val != null && val !== '') || "Color is required.",
       }
     },
+    events: {
+      name: "events",
+      displayName: "Events",
+      type: "collection",
+      itemType: {
+        name: "$collectionItem",
+        displayName: "",
+        role: "value",
+        type: "model",
+        get typeDef() { return (domain.types.Event as ModelType & { name: "Event" }) },
+      },
+      role: "collectionNavigation",
+      get foreignKey() { return (domain.types.Event as ModelType & { name: "Event" }).props.carId as ForeignKeyProperty },
+      get inverseNavigation() { return (domain.types.Event as ModelType & { name: "Event" }).props.car as ModelReferenceNavigationProperty },
+      dontSerialize: true,
+    },
   },
   methods: {
   },
@@ -362,13 +376,48 @@ export const Event = domain.types.Event = {
       name: "carId",
       displayName: "Car Id",
       type: "number",
-      role: "value",
+      role: "foreignKey",
+      get principalKey() { return (domain.types.Car as ModelType & { name: "Car" }).props.carId as PrimaryKeyProperty },
+      get principalType() { return (domain.types.Car as ModelType & { name: "Car" }) },
+      get navigationProp() { return (domain.types.Event as ModelType & { name: "Event" }).props.car as ModelReferenceNavigationProperty },
+      hidden: 3 as HiddenAreas,
+      rules: {
+        required: val => val != null || "Car is required.",
+      }
+    },
+    car: {
+      name: "car",
+      displayName: "Car",
+      type: "model",
+      get typeDef() { return (domain.types.Car as ModelType & { name: "Car" }) },
+      role: "referenceNavigation",
+      get foreignKey() { return (domain.types.Event as ModelType & { name: "Event" }).props.carId as ForeignKeyProperty },
+      get principalKey() { return (domain.types.Car as ModelType & { name: "Car" }).props.carId as PrimaryKeyProperty },
+      get inverseNavigation() { return (domain.types.Car as ModelType & { name: "Car" }).props.events as ModelCollectionNavigationProperty },
+      dontSerialize: true,
     },
     eventTypeId: {
       name: "eventTypeId",
       displayName: "Event Type Id",
       type: "number",
-      role: "value",
+      role: "foreignKey",
+      get principalKey() { return (domain.types.EventTypeDefinition as ModelType & { name: "EventTypeDefinition" }).props.eventTypeDefinitionId as PrimaryKeyProperty },
+      get principalType() { return (domain.types.EventTypeDefinition as ModelType & { name: "EventTypeDefinition" }) },
+      get navigationProp() { return (domain.types.Event as ModelType & { name: "Event" }).props.eventTypeDefinition as ModelReferenceNavigationProperty },
+      hidden: 3 as HiddenAreas,
+      rules: {
+        required: val => val != null || "Event Type Definition is required.",
+      }
+    },
+    eventTypeDefinition: {
+      name: "eventTypeDefinition",
+      displayName: "Event Type Definition",
+      type: "model",
+      get typeDef() { return (domain.types.EventTypeDefinition as ModelType & { name: "EventTypeDefinition" }) },
+      role: "referenceNavigation",
+      get foreignKey() { return (domain.types.Event as ModelType & { name: "Event" }).props.eventTypeId as ForeignKeyProperty },
+      get principalKey() { return (domain.types.EventTypeDefinition as ModelType & { name: "EventTypeDefinition" }).props.eventTypeDefinitionId as PrimaryKeyProperty },
+      dontSerialize: true,
     },
     jsonData: {
       name: "jsonData",
@@ -393,6 +442,57 @@ export const Event = domain.types.Event = {
       type: "date",
       dateKind: "datetime",
       noOffset: true,
+      role: "value",
+    },
+  },
+  methods: {
+  },
+  dataSources: {
+    myEvents: {
+      type: "dataSource",
+      name: "MyEvents" as const,
+      displayName: "My Events",
+      isDefault: true,
+      props: {
+      },
+    },
+  },
+}
+export const EventTypeDefinition = domain.types.EventTypeDefinition = {
+  name: "EventTypeDefinition" as const,
+  displayName: "Event Type Definition",
+  get displayProp() { return this.props.name }, 
+  type: "model",
+  controllerRoute: "EventTypeDefinition",
+  get keyProp() { return this.props.eventTypeDefinitionId }, 
+  behaviorFlags: 7 as BehaviorFlags,
+  props: {
+    eventTypeDefinitionId: {
+      name: "eventTypeDefinitionId",
+      displayName: "Event Type Definition Id",
+      type: "number",
+      role: "primaryKey",
+      hidden: 3 as HiddenAreas,
+    },
+    name: {
+      name: "name",
+      displayName: "Name",
+      type: "string",
+      role: "value",
+      rules: {
+        required: val => (val != null && val !== '') || "Name is required.",
+      }
+    },
+    description: {
+      name: "description",
+      displayName: "Description",
+      type: "string",
+      role: "value",
+    },
+    isActive: {
+      name: "isActive",
+      displayName: "Is Active",
+      type: "boolean",
       role: "value",
     },
   },
@@ -956,6 +1056,7 @@ interface AppDomain extends Domain {
     AuditLogProperty: typeof AuditLogProperty
     Car: typeof Car
     Event: typeof Event
+    EventTypeDefinition: typeof EventTypeDefinition
     Role: typeof Role
     User: typeof User
     UserInfo: typeof UserInfo

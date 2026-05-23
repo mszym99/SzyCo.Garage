@@ -23,6 +23,11 @@ export class EventApiClient extends ModelApiClient<$models.Event> {
 }
 
 
+export class EventTypeDefinitionApiClient extends ModelApiClient<$models.EventTypeDefinition> {
+  constructor() { super($metadata.EventTypeDefinition) }
+}
+
+
 export class RoleApiClient extends ModelApiClient<$models.Role> {
   constructor() { super($metadata.Role) }
 }

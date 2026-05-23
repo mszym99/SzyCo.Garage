@@ -1,6 +1,6 @@
 <template>
   <v-dialog v-model="dialog" max-width="600px">
-    <template v-slot:activator="{ props: activatorProps }">
+    <template #activator="{ props: activatorProps }">
       <v-btn
         v-bind="activatorProps"
         color="surface-variant"
@@ -26,14 +26,21 @@
 
           <v-select
             v-model="eventForm.EventTypeId"
-            :items="eventTypes"
+            :items="eventTypeOptions"
             item-title="name"
-            item-value="id"
+            item-value="eventTypeDefinitionId"
             label="Event Type"
+            :loading="eventTypeList.$load.isLoading"
+            :rules="requiredRule"
             required
           />
 
-          <div v-if="eventForm.EventTypeId === 1">
+          <div
+            v-if="((eventTypeOptions.find(option => option.eventTypeDefinitionId === eventForm.EventTypeId)?.code
+              ?? eventTypeOptions.find(option => option.eventTypeDefinitionId === eventForm.EventTypeId)?.slug
+              ?? eventTypeOptions.find(option => option.eventTypeDefinitionId === eventForm.EventTypeId)?.name
+              ?? '').toString().toLowerCase()) === 'replacement'"
+          >
             <v-text-field
               v-model="replacementFields.PartName"
               label="Part Name"
@@ -62,12 +69,11 @@
   </v-dialog>
 </template>
 <script setup lang="ts">
-import { ref, onMounted, computed, defineProps } from "vue";
+import { ref, onMounted, computed } from "vue";
 import {
   EventViewModel,
-  CarViewModel,
-  SecurityServiceViewModel,
   CarListViewModel,
+  EventTypeDefinitionListViewModel,
 } from "@/viewmodels.g";
 
 const emit = defineEmits<{ saved: [] }>();
@@ -75,7 +81,6 @@ const emit = defineEmits<{ saved: [] }>();
 const dialog = ref(false);
 const valid = ref(false);
 
-// Form state
 const eventForm = ref({
   CarId: null as number | null,
   EventTypeId: null as number | null,
@@ -87,13 +92,32 @@ const replacementFields = ref({
   Cost: "",
 });
 
-// Rules
 const requiredRule = [(v: unknown) => !!v || "This field is required"];
 
-// Event types
-const eventTypes = ref([{ id: 1, name: "Replacement" }]);
+// Load event types from backend
+const eventTypeList = new EventTypeDefinitionListViewModel();
 
-// Cars
+onMounted(() => {
+  eventTypeList.$load();
+});
+
+const eventTypeOptions = computed(() => {
+  return eventTypeList.$items
+    .filter((et) => et.isActive)
+    .map((et) => ({
+      eventTypeDefinitionId: et.eventTypeDefinitionId!,
+      name: et.name!,
+    }));
+});
+
+const selectedEventTypeName = computed(() => {
+  if (!eventForm.value.EventTypeId) return null;
+  const found = eventTypeList.$items.find(
+    (et) => et.eventTypeDefinitionId === eventForm.value.EventTypeId,
+  );
+  return found?.name ?? null;
+});
+
 const props = defineProps<{
   carList: CarListViewModel;
 }>();
@@ -106,7 +130,6 @@ const carOptions = computed(() => {
   }));
 });
 
-// Save
 const saveEvent = async () => {
   const eventVM = new EventViewModel();
   eventVM.carId = eventForm.value.CarId!;
@@ -114,7 +137,7 @@ const saveEvent = async () => {
 
   let jsonData: Record<string, string> = {};
 
-  if (eventForm.value.EventTypeId === 1) {
+  if (selectedEventTypeName.value === "Replacement") {
     jsonData = {
       partName: replacementFields.value.PartName,
       reason: replacementFields.value.Reason,

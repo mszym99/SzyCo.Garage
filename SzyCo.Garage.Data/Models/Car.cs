@@ -5,11 +5,11 @@ public class Car
     [Key]
     public int CarId { get; set; }
 
-    // Foreign key to AspNetUsers.Id
     [ForeignKey(nameof(User))]
-    public required string UserId { get; set; }
+    [Read]
+    public string UserId { get; set; } = null!;
 
-    // Navigation property to the Identity user
+    [Read]
     public User User { get; set; } = null!;
 
     public required int Year { get; set; }
@@ -17,12 +17,49 @@ public class Car
     public required string Model { get; set; }
     public required string Color { get; set; }
 
+    public ICollection<Event>? Events { get; set; }
+
     [DefaultDataSource]
-    public class MyGarage : StandardDataSource<Car, AppDbContext> {
+    public class MyGarage : AppDataSource<Car>
+    {
         public MyGarage(CrudContext<AppDbContext> context) : base(context) { }
 
         public override IQueryable<Car> GetQuery(IDataSourceParameters parameters)
-            => Db.Cars.Where(f => f.UserId == User.GetUserId());    
+            => Db.Cars.Where(f => f.UserId == User.GetUserId());
     }
 
+    public class CarBehaviors : AppBehaviors<Car>
+    {
+        public CarBehaviors(CrudContext<AppDbContext> context) : base(context) { }
+
+        public override ItemResult BeforeSave(SaveKind kind, Car? oldItem, Car item)
+        {
+            var userId = User.GetUserId();
+            if (string.IsNullOrEmpty(userId)) return "Authentication required.";
+
+            if (kind == SaveKind.Create)
+            {
+                // Server sets ownership — ignore any client-supplied value
+                item.UserId = userId;
+            }
+            else
+            {
+                // On update, verify the car belongs to the current user
+                if (oldItem?.UserId != userId) return "You can only edit your own cars.";
+                // Prevent transferring ownership
+                item.UserId = userId;
+            }
+
+            return base.BeforeSave(kind, oldItem, item);
+        }
+
+        public override ItemResult BeforeDelete(Car item)
+        {
+            var userId = User.GetUserId();
+            if (string.IsNullOrEmpty(userId)) return "Authentication required.";
+            if (item.UserId != userId) return "You can only delete your own cars.";
+
+            return base.BeforeDelete(item);
+        }
+    }
 }

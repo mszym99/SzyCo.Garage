@@ -34,6 +34,7 @@ public class AppDbContext
     public DbSet<Widget> Widgets => Set<Widget>();
     public DbSet<Car> Cars => Set<Car>();
     public DbSet<Event> Events => Set<Event>();
+    public DbSet<EventTypeDefinition> EventTypeDefinitions => Set<EventTypeDefinition>();
 
     [InternalUse]
     public DbSet<DataProtectionKey> DataProtectionKeys => Set<DataProtectionKey>();

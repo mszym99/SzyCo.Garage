@@ -375,3 +375,6 @@ wwwroot/
 # Local ASP.NET Core settings (may contain connection strings/secrets)
 appsettings.json
 appsettings.*.json
+
+# Local machine overrides (loaded optionally by Program.cs)
+SzyCo.Garage.Web/appsettings.localhost.json
