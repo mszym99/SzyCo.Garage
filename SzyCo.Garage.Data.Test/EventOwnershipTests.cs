@@ -58,7 +58,7 @@ public class EventOwnershipTests : TestBase
     {
         // Arrange
         var otherUsersCar = CreateCar(UserBId);
-        CreateEventType();
+        var eventType = CreateEventType();
         RefreshServices();
 
         SetCurrentUser(UserAId);
@@ -66,7 +66,7 @@ public class EventOwnershipTests : TestBase
         var newEvent = new Event
         {
             CarId = otherUsersCar.CarId,
-            EventTypeId = 1,
+            EventTypeId = eventType.EventTypeDefinitionId,
             JsonData = "{}",
         };
 
@@ -82,7 +82,7 @@ public class EventOwnershipTests : TestBase
     {
         // Arrange
         var ownCar = CreateCar(UserAId);
-        CreateEventType();
+        var eventType = CreateEventType();
         RefreshServices();
 
         SetCurrentUser(UserAId);
@@ -90,7 +90,7 @@ public class EventOwnershipTests : TestBase
         var newEvent = new Event
         {
             CarId = ownCar.CarId,
-            EventTypeId = 1,
+            EventTypeId = eventType.EventTypeDefinitionId,
             JsonData = "{}",
         };
 
@@ -106,7 +106,7 @@ public class EventOwnershipTests : TestBase
     {
         // Arrange
         var otherUsersCar = CreateCar(UserBId);
-        CreateEventType();
+        var eventType = CreateEventType();
         RefreshServices();
 
         SetCurrentUser(UserAId);
@@ -114,7 +114,7 @@ public class EventOwnershipTests : TestBase
         var existingEvent = new Event
         {
             CarId = otherUsersCar.CarId,
-            EventTypeId = 1,
+            EventTypeId = eventType.EventTypeDefinitionId,
             JsonData = "{}",
         };
 
