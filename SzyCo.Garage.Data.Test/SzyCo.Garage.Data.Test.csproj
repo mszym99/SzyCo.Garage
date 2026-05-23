@@ -24,6 +24,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SzyCo.Garage.Data\SzyCo.Garage.Data.csproj" />
+    <ProjectReference Include="..\SzyCo.Garage.Web\SzyCo.Garage.Web.csproj" />
   </ItemGroup>
 
   <ItemGroup>
