@@ -62,11 +62,11 @@ item.$useAutoSave({
   debounce: { maxWait: 3000 },
 });
 
-(async function onCreated() {
+onMounted(async () => {
   if (props.id) {
     await item.$load(props.id);
   } else {
     useBindKeyToRouteOnCreate(item);
   }
-})();
+});
 </script>

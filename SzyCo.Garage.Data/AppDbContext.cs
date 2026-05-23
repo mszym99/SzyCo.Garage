@@ -3,12 +3,7 @@ using IntelliTect.Coalesce.AuditLogging;
 using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Microsoft.EntityFrameworkCore.Diagnostics;
-using Microsoft.EntityFrameworkCore.ValueGeneration;
-using System.Linq.Expressions;
 using System.Security.Cryptography;
-using SzyCo.Cars.Data.Models;
 
 namespace SzyCo.Garage.Data;
 
@@ -29,7 +24,6 @@ public class AppDbContext
 {
     public bool SuppressAudit { get; set; } = false;
 
-
     public AppDbContext() { }
 
     public AppDbContext(DbContextOptions options) : base(options) { }
@@ -37,10 +31,9 @@ public class AppDbContext
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
     public DbSet<AuditLogProperty> AuditLogProperties => Set<AuditLogProperty>();
 
-
-
     public DbSet<Widget> Widgets => Set<Widget>();
     public DbSet<Car> Cars => Set<Car>();
+    public DbSet<Event> Events => Set<Event>();
 
     [InternalUse]
     public DbSet<DataProtectionKey> DataProtectionKeys => Set<DataProtectionKey>();

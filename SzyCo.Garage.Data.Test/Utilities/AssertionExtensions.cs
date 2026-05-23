@@ -39,7 +39,7 @@ public static class AssertionExtensions
     {
         Assert.Null(result.Message);
         Assert.True(result.WasSuccessful);
-        return result.Object ?? throw new ArgumentException("Sucessful result unexpectedly returned null object");
+        return result.Object ?? throw new ArgumentException("Successful result unexpectedly returned null object");
     }
 
     /// <summary>

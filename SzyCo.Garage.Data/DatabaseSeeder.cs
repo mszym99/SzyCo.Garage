@@ -7,7 +7,6 @@ public class DatabaseSeeder(AppDbContext db)
         SeedRoles();
     }
 
-
     private void SeedRoles()
     {
         if (!db.Roles.Any())

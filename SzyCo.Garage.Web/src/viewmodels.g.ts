@@ -93,6 +93,30 @@ export class CarListViewModel extends ListViewModel<$models.Car, $apiClients.Car
 }
 
 
+export interface EventViewModel extends $models.Event {
+  id: number | null;
+  carId: number | null;
+  eventTypeId: number | null;
+  jsonData: string | null;
+  createDate: Date | null;
+  modifiedDate: Date | null;
+}
+export class EventViewModel extends ViewModel<$models.Event, $apiClients.EventApiClient, number> implements $models.Event  {
+  
+  constructor(initialData?: DeepPartial<$models.Event> | null) {
+    super($metadata.Event, new $apiClients.EventApiClient(), initialData)
+  }
+}
+defineProps(EventViewModel, $metadata.Event)
+
+export class EventListViewModel extends ListViewModel<$models.Event, $apiClients.EventApiClient, EventViewModel> {
+  
+  constructor() {
+    super($metadata.Event, new $apiClients.EventApiClient())
+  }
+}
+
+
 export interface RoleViewModel extends $models.Role {
   name: string | null;
   permissions: $models.Permission[] | null;
@@ -255,6 +279,14 @@ export class CarServiceViewModel extends ServiceViewModel<typeof $metadata.CarSe
 }
 
 
+export class EventServiceViewModel extends ServiceViewModel<typeof $metadata.EventService, $apiClients.EventServiceApiClient> {
+  
+  constructor() {
+    super($metadata.EventService, new $apiClients.EventServiceApiClient())
+  }
+}
+
+
 export class SecurityServiceViewModel extends ServiceViewModel<typeof $metadata.SecurityService, $apiClients.SecurityServiceApiClient> {
   
   public get whoAmI() {
@@ -278,6 +310,7 @@ const viewModelTypeLookup = ViewModel.typeLookup = {
   AuditLog: AuditLogViewModel,
   AuditLogProperty: AuditLogPropertyViewModel,
   Car: CarViewModel,
+  Event: EventViewModel,
   Role: RoleViewModel,
   User: UserViewModel,
   UserRole: UserRoleViewModel,
@@ -287,6 +320,7 @@ const listViewModelTypeLookup = ListViewModel.typeLookup = {
   AuditLog: AuditLogListViewModel,
   AuditLogProperty: AuditLogPropertyListViewModel,
   Car: CarListViewModel,
+  Event: EventListViewModel,
   Role: RoleListViewModel,
   User: UserListViewModel,
   UserRole: UserRoleListViewModel,
@@ -294,6 +328,7 @@ const listViewModelTypeLookup = ListViewModel.typeLookup = {
 }
 const serviceViewModelTypeLookup = ServiceViewModel.typeLookup = {
   CarService: CarServiceViewModel,
+  EventService: EventServiceViewModel,
   SecurityService: SecurityServiceViewModel,
 }
 

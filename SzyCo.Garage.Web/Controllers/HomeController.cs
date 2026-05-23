@@ -1,8 +1,5 @@
-using SzyCo.Garage.Data.Auth;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.WebUtilities;
 using System.Web;
 
 namespace SzyCo.Garage.Web.Controllers;
@@ -22,7 +19,6 @@ public class HomeController() : Controller
         [FromServices] IWebHostEnvironment hostingEnvironment
     )
     {
-
         var fileInfo = hostingEnvironment.WebRootFileProvider.GetFileInfo("index.html");
         if (!fileInfo.Exists) return NotFound($"{hostingEnvironment.WebRootPath}/index.html was not found");
 
@@ -37,8 +33,6 @@ public class HomeController() : Controller
             ASPNETCORE_ENVIRONMENT="{JsEncode(hostingEnvironment.EnvironmentName)}"
         </script>
         """;
-
-
         contents = contents.Replace("<head>", "<head>" + headPrepend);
 
         return Content(contents, "text/html");
