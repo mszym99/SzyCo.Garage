@@ -2,9 +2,7 @@
 using SzyCo.Garage.Data.Auth;
 using SzyCo.Garage.Data.Communication;
 using SzyCo.Garage.Data.Models;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace SzyCo.Garage.Web;
 
@@ -37,8 +35,7 @@ public static class ProgramAuthConfiguration
         builder.Services.AddScoped<UserManagementService>();
 
         builder.Services
-            .AddAuthentication()
-            ;
+            .AddAuthentication();
 
         builder.Services.Configure<SecurityStampValidatorOptions>(o =>
         {
@@ -50,8 +47,6 @@ public static class ProgramAuthConfiguration
         builder.Services.ConfigureApplicationCookie(c =>
         {
             c.LoginPath = "/SignIn"; // Razor page "Pages/SignIn.cshtml"
-
         });
     }
-
 }

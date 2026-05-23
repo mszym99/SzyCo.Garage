@@ -22,9 +22,6 @@ public class User : IdentityUser
     [Read]
     public override bool EmailConfirmed { get; set; }
 
-
-
-
     [InternalUse]
     public override string? NormalizedUserName { get; set; }
 
@@ -68,9 +65,6 @@ public class User : IdentityUser
     [Display(Name = "Roles")]
     [Read(nameof(Permission.UserAdmin))]
     public IEnumerable<string>? RoleNames => UserRoles?.Where(ur => ur.Role != null).Select(r => r.Role!.Name!);
-
-
-
 
     [Coalesce]
     public async Task<ItemResult> SetEmail(

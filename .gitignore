@@ -32,6 +32,19 @@ bld/
 
 # Visual Studio 2015/2017 cache/options directory
 .vs/
+
+# Visual Studio Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# JetBrains IDEs
+.idea/
+*.sln.iml
+
 # Uncomment if you have tasks that create the project's static files in wwwroot
 # For Vite builds, exclude generated assets but keep index.html
 **/wwwroot/assets/
@@ -348,3 +361,17 @@ healthchecksdb
 
 # Backup folder for Package Reference Convert tool in Visual Studio 2017
 MigrationBackup/
+
+# Node.js / Frontend
+dist/
+*.tsbuildinfo
+.env
+.env.local
+.env*.local
+
+# Vite build output served by ASP.NET Core
+wwwroot/
+
+# Local ASP.NET Core settings (may contain connection strings/secrets)
+appsettings.json
+appsettings.*.json

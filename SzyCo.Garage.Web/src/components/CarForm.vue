@@ -38,10 +38,11 @@
 import { ref } from "vue";
 import { CarViewModel, SecurityServiceViewModel } from "@/viewmodels.g";
 
-const dialog = ref(false); // or control from parent
+const emit = defineEmits<{ saved: [] }>();
+
+const dialog = ref(false);
 const valid = ref(false);
 const ssvm = new SecurityServiceViewModel();
-const UserInfoId = ssvm.whoAmI();
 
 const car = ref({
   CarId: null as number | null,
@@ -53,9 +54,10 @@ const car = ref({
 });
 
 const saveCar = async () => {
+  const userInfo = await ssvm.whoAmI();
   const carVM = new CarViewModel();
   carVM.carId = car.value.CarId;
-  carVM.userId = (await UserInfoId).id;
+  carVM.userId = userInfo.id;
   carVM.year = parseInt(car.value.Year);
   carVM.make = car.value.Make;
   carVM.model = car.value.Model;
@@ -63,8 +65,8 @@ const saveCar = async () => {
 
   try {
     await carVM.$save();
-    console.log("Car saved!");
     dialog.value = false;
+    emit("saved");
   } catch (err) {
     console.error("Error saving car:", err);
   }

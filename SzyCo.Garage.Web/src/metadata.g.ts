@@ -342,6 +342,65 @@ export const Car = domain.types.Car = {
     },
   },
 }
+export const Event = domain.types.Event = {
+  name: "Event" as const,
+  displayName: "Event",
+  get displayProp() { return this.props.id }, 
+  type: "model",
+  controllerRoute: "Event",
+  get keyProp() { return this.props.id }, 
+  behaviorFlags: 7 as BehaviorFlags,
+  props: {
+    id: {
+      name: "id",
+      displayName: "Id",
+      type: "number",
+      role: "primaryKey",
+      hidden: 3 as HiddenAreas,
+    },
+    carId: {
+      name: "carId",
+      displayName: "Car Id",
+      type: "number",
+      role: "value",
+    },
+    eventTypeId: {
+      name: "eventTypeId",
+      displayName: "Event Type Id",
+      type: "number",
+      role: "value",
+    },
+    jsonData: {
+      name: "jsonData",
+      displayName: "Json Data",
+      type: "string",
+      role: "value",
+      rules: {
+        required: val => (val != null && val !== '') || "Json Data is required.",
+      }
+    },
+    createDate: {
+      name: "createDate",
+      displayName: "Create Date",
+      type: "date",
+      dateKind: "datetime",
+      noOffset: true,
+      role: "value",
+    },
+    modifiedDate: {
+      name: "modifiedDate",
+      displayName: "Modified Date",
+      type: "date",
+      dateKind: "datetime",
+      noOffset: true,
+      role: "value",
+    },
+  },
+  methods: {
+  },
+  dataSources: {
+  },
+}
 export const Role = domain.types.Role = {
   name: "Role" as const,
   displayName: "Role",
@@ -854,6 +913,14 @@ export const CarService = domain.services.CarService = {
   methods: {
   },
 }
+export const EventService = domain.services.EventService = {
+  name: "EventService",
+  displayName: "Event Service",
+  type: "service",
+  controllerRoute: "EventService",
+  methods: {
+  },
+}
 export const SecurityService = domain.services.SecurityService = {
   name: "SecurityService",
   displayName: "Security Service",
@@ -888,6 +955,7 @@ interface AppDomain extends Domain {
     AuditLog: typeof AuditLog
     AuditLogProperty: typeof AuditLogProperty
     Car: typeof Car
+    Event: typeof Event
     Role: typeof Role
     User: typeof User
     UserInfo: typeof UserInfo
@@ -896,6 +964,7 @@ interface AppDomain extends Domain {
   }
   services: {
     CarService: typeof CarService
+    EventService: typeof EventService
     SecurityService: typeof SecurityService
   }
 }

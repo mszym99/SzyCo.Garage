@@ -18,6 +18,11 @@ export class CarApiClient extends ModelApiClient<$models.Car> {
 }
 
 
+export class EventApiClient extends ModelApiClient<$models.Event> {
+  constructor() { super($metadata.Event) }
+}
+
+
 export class RoleApiClient extends ModelApiClient<$models.Role> {
   constructor() { super($metadata.Role) }
 }
@@ -68,6 +73,11 @@ export class WidgetApiClient extends ModelApiClient<$models.Widget> {
 
 export class CarServiceApiClient extends ServiceApiClient<typeof $metadata.CarService> {
   constructor() { super($metadata.CarService) }
+}
+
+
+export class EventServiceApiClient extends ServiceApiClient<typeof $metadata.EventService> {
+  constructor() { super($metadata.EventService) }
 }
 
 

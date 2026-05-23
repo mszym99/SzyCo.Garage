@@ -12,6 +12,7 @@ declare module 'vue' {
     CarTable: typeof import('./../components/CarTable.vue')['default']
     CInput: typeof import('coalesce-vue-vuetify3')['CInput']
     CLoaderStatus: typeof import('coalesce-vue-vuetify3')['CLoaderStatus']
+    EventForm: typeof import('./../components/EventForm.vue')['default']
     HelloWorld: typeof import('./../components/HelloWorld.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']

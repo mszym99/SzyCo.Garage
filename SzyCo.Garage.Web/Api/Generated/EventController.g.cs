@@ -21,75 +21,75 @@ using SzyCo.Garage.Web.Models;
 
 namespace SzyCo.Garage.Web.Api
 {
-    [Route("api/Car")]
+    [Route("api/Event")]
     [Authorize]
     [ServiceFilter(typeof(IApiActionFilter))]
-    public partial class CarController
-        : BaseApiController<SzyCo.Garage.Data.Models.Car, CarParameter, CarResponse, SzyCo.Garage.Data.AppDbContext>
+    public partial class EventController
+        : BaseApiController<SzyCo.Garage.Data.Models.Event, EventParameter, EventResponse, SzyCo.Garage.Data.AppDbContext>
     {
-        public CarController(CrudContext<SzyCo.Garage.Data.AppDbContext> context) : base(context)
+        public EventController(CrudContext<SzyCo.Garage.Data.AppDbContext> context) : base(context)
         {
-            GeneratedForClassViewModel = context.ReflectionRepository.GetClassViewModel<SzyCo.Garage.Data.Models.Car>();
+            GeneratedForClassViewModel = context.ReflectionRepository.GetClassViewModel<SzyCo.Garage.Data.Models.Event>();
         }
 
         [HttpGet("get/{id}")]
         [Authorize]
-        public virtual Task<ItemResult<CarResponse>> Get(
+        public virtual Task<ItemResult<EventResponse>> Get(
             int id,
             [FromQuery] DataSourceParameters parameters,
-            IDataSource<SzyCo.Garage.Data.Models.Car> dataSource)
+            IDataSource<SzyCo.Garage.Data.Models.Event> dataSource)
             => GetImplementation(id, parameters, dataSource);
 
         [HttpGet("list")]
         [Authorize]
-        public virtual Task<ListResult<CarResponse>> List(
+        public virtual Task<ListResult<EventResponse>> List(
             [FromQuery] ListParameters parameters,
-            IDataSource<SzyCo.Garage.Data.Models.Car> dataSource)
+            IDataSource<SzyCo.Garage.Data.Models.Event> dataSource)
             => ListImplementation(parameters, dataSource);
 
         [HttpGet("count")]
         [Authorize]
         public virtual Task<ItemResult<int>> Count(
             [FromQuery] FilterParameters parameters,
-            IDataSource<SzyCo.Garage.Data.Models.Car> dataSource)
+            IDataSource<SzyCo.Garage.Data.Models.Event> dataSource)
             => CountImplementation(parameters, dataSource);
 
         [HttpPost("save")]
         [Consumes("application/x-www-form-urlencoded", "multipart/form-data")]
         [Authorize]
-        public virtual Task<ItemResult<CarResponse>> Save(
-            [FromForm] CarParameter dto,
+        public virtual Task<ItemResult<EventResponse>> Save(
+            [FromForm] EventParameter dto,
             [FromQuery] DataSourceParameters parameters,
-            IDataSource<SzyCo.Garage.Data.Models.Car> dataSource,
-            IBehaviors<SzyCo.Garage.Data.Models.Car> behaviors)
+            IDataSource<SzyCo.Garage.Data.Models.Event> dataSource,
+            IBehaviors<SzyCo.Garage.Data.Models.Event> behaviors)
             => SaveImplementation(dto, parameters, dataSource, behaviors);
 
         [HttpPost("save")]
         [Consumes("application/json")]
         [Authorize]
-        public virtual Task<ItemResult<CarResponse>> SaveFromJson(
-            [FromBody] CarParameter dto,
+        public virtual Task<ItemResult<EventResponse>> SaveFromJson(
+            [FromBody] EventParameter dto,
             [FromQuery] DataSourceParameters parameters,
-            IDataSource<SzyCo.Garage.Data.Models.Car> dataSource,
-            IBehaviors<SzyCo.Garage.Data.Models.Car> behaviors)
+            IDataSource<SzyCo.Garage.Data.Models.Event> dataSource,
+            IBehaviors<SzyCo.Garage.Data.Models.Event> behaviors)
             => SaveImplementation(dto, parameters, dataSource, behaviors);
 
         [HttpPost("bulkSave")]
         [Authorize]
-        public virtual Task<ItemResult<CarResponse>> BulkSave(
+        public virtual Task<ItemResult<EventResponse>> BulkSave(
             [FromBody] BulkSaveRequest dto,
             [FromQuery] DataSourceParameters parameters,
-            IDataSource<SzyCo.Garage.Data.Models.Car> dataSource,
+            IDataSource<SzyCo.Garage.Data.Models.Event> dataSource,
             [FromServices] IDataSourceFactory dataSourceFactory,
             [FromServices] IBehaviorsFactory behaviorsFactory)
             => BulkSaveImplementation(dto, parameters, dataSource, dataSourceFactory, behaviorsFactory);
 
         [HttpPost("delete/{id}")]
         [Authorize]
-        public virtual Task<ItemResult<CarResponse>> Delete(
+        public virtual Task<ItemResult<EventResponse>> Delete(
             int id,
-            IBehaviors<SzyCo.Garage.Data.Models.Car> behaviors,
-            IDataSource<SzyCo.Garage.Data.Models.Car> dataSource)
+            IBehaviors<SzyCo.Garage.Data.Models.Event> behaviors,
+            IDataSource<SzyCo.Garage.Data.Models.Event> dataSource)
             => DeleteImplementation(id, new DataSourceParameters(), dataSource, behaviors);
     }
 }
