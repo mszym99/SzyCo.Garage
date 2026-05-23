@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.ComponentModel.DataAnnotations;
+using SzyCo.Garage.Web;
 
 namespace SzyCo.Garage.Web.Pages;
 
@@ -73,7 +74,7 @@ public class RegisterModel(
         else
         {
             await signInManager.SignInAsync(user, isPersistent: false);
-            return LocalRedirect(ReturnUrl ?? "/");
+            return LocalRedirect(ReturnUrlHelper.GetLocalOrDefault(Url, ReturnUrl));
         }
     }
 }

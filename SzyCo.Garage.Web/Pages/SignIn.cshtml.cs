@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.ComponentModel.DataAnnotations;
+using SzyCo.Garage.Web;
 
 namespace SzyCo.Garage.Web.Pages;
 
@@ -33,7 +34,7 @@ public class SignInModel(SignInManager<User> signInManager) : PageModel
         var result = await signInManager.PasswordSignInAsync(Username, Password, true, true);
         if (result.Succeeded)
         {
-            return LocalRedirect(ReturnUrl ?? "/");
+            return LocalRedirect(ReturnUrlHelper.GetLocalOrDefault(Url, ReturnUrl));
         }
 
         ModelState.AddModelError(string.Empty, result.IsLockedOut ? "Account locked out" : "Invalid login attempt.");
