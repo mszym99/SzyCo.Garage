@@ -100,6 +100,7 @@ export interface Car extends Model<typeof metadata.Car> {
   make: string | null
   model: string | null
   color: string | null
+  events: Event[] | null
 }
 export class Car {
   
@@ -133,7 +134,9 @@ export namespace Car {
 export interface Event extends Model<typeof metadata.Event> {
   id: number | null
   carId: number | null
+  car: Car | null
   eventTypeId: number | null
+  eventTypeDefinition: EventTypeDefinition | null
   jsonData: string | null
   createDate: Date | null
   modifiedDate: Date | null
@@ -155,6 +158,41 @@ export class Event {
   /** Instantiate a new Event, optionally basing it on the given data. */
   constructor(data?: Partial<Event> | {[k: string]: any}) {
     Object.assign(this, Event.map(data || {}));
+  }
+}
+export namespace Event {
+  export namespace DataSources {
+    
+    export class MyEvents implements DataSource<typeof metadata.Event.dataSources.myEvents> {
+      readonly $metadata = metadata.Event.dataSources.myEvents
+    }
+  }
+}
+
+
+export interface EventTypeDefinition extends Model<typeof metadata.EventTypeDefinition> {
+  eventTypeDefinitionId: number | null
+  name: string | null
+  description: string | null
+  isActive: boolean | null
+}
+export class EventTypeDefinition {
+  
+  /** Mutates the input object and its descendents into a valid EventTypeDefinition implementation. */
+  static convert(data?: Partial<EventTypeDefinition>): EventTypeDefinition {
+    return convertToModel(data || {}, metadata.EventTypeDefinition) 
+  }
+  
+  /** Maps the input object and its descendents to a new, valid EventTypeDefinition implementation. */
+  static map(data?: Partial<EventTypeDefinition>): EventTypeDefinition {
+    return mapToModel(data || {}, metadata.EventTypeDefinition) 
+  }
+  
+  static [Symbol.hasInstance](x: any) { return x?.$metadata === metadata.EventTypeDefinition; }
+  
+  /** Instantiate a new EventTypeDefinition, optionally basing it on the given data. */
+  constructor(data?: Partial<EventTypeDefinition> | {[k: string]: any}) {
+    Object.assign(this, EventTypeDefinition.map(data || {}));
   }
 }
 
@@ -338,6 +376,7 @@ declare module "coalesce-vue/lib/model" {
     AuditLogProperty: AuditLogProperty
     Car: Car
     Event: Event
+    EventTypeDefinition: EventTypeDefinition
     Role: Role
     User: User
     UserInfo: UserInfo

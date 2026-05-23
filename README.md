@@ -55,7 +55,7 @@ Update the connection string in \`SzyCo.Garage.Web/appsettings.json\`:
 \`\`\`json
 {
   "ConnectionStrings": {
-    "DefaultConnection": "Server=(localdb)\\mssqllocaldb;Database=SzyCo.Garage;Trusted_Connection=true;MultipleActiveResultSets=true"
+    "DefaultConnection": "Server=(localdb)\\mssqllocaldb;Database=mount-database;Trusted_Connection=true;MultipleActiveResultSets=true"
   }
 }
 \`\`\`

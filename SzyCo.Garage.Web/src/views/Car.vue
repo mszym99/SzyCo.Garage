@@ -18,9 +18,8 @@ onMounted(() => {
 <template>
   <div class="home">
     <h1>My Garage</h1>
-    <CarForm @car-added="carList.$load" />
+    <CarForm @saved="carList.$load" />
 
-    <!-- ✅ THIS is the fix -->
     <EventForm :carList="carList" />
 
     <div class="car-list mt-6" style="align-items: flex-start">

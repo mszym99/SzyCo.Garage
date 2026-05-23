@@ -5,6 +5,7 @@ public class DatabaseSeeder(AppDbContext db)
     public void Seed()
     {
         SeedRoles();
+        SeedEventTypeDefinitions();
     }
 
     private void SeedRoles()
@@ -21,6 +22,21 @@ public class DatabaseSeeder(AppDbContext db)
             // NOTE: In this application's permissions-based authorization system,
             // additional roles can freely be created by administrators.
             // You don't have to seed every possible role.
+
+            db.SaveChanges();
+        }
+    }
+
+    private void SeedEventTypeDefinitions()
+    {
+        if (!db.EventTypeDefinitions.Any())
+        {
+            db.EventTypeDefinitions.Add(new()
+            {
+                Name = "Replacement",
+                Description = "A part replacement event",
+                IsActive = true,
+            });
 
             db.SaveChanges();
         }

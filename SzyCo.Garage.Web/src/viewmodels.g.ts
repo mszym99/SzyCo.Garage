@@ -74,9 +74,16 @@ export interface CarViewModel extends $models.Car {
   make: string | null;
   model: string | null;
   color: string | null;
+  get events(): ViewModelCollection<EventViewModel, $models.Event>;
+  set events(value: (EventViewModel | $models.Event)[] | null);
 }
 export class CarViewModel extends ViewModel<$models.Car, $apiClients.CarApiClient, number> implements $models.Car  {
   static DataSources = $models.Car.DataSources;
+  
+  
+  public addToEvents(initialData?: DeepPartial<$models.Event> | null) {
+    return this.$addChild('events', initialData) as EventViewModel
+  }
   
   constructor(initialData?: DeepPartial<$models.Car> | null) {
     super($metadata.Car, new $apiClients.CarApiClient(), initialData)
@@ -96,12 +103,17 @@ export class CarListViewModel extends ListViewModel<$models.Car, $apiClients.Car
 export interface EventViewModel extends $models.Event {
   id: number | null;
   carId: number | null;
+  get car(): CarViewModel | null;
+  set car(value: CarViewModel | $models.Car | null);
   eventTypeId: number | null;
+  get eventTypeDefinition(): EventTypeDefinitionViewModel | null;
+  set eventTypeDefinition(value: EventTypeDefinitionViewModel | $models.EventTypeDefinition | null);
   jsonData: string | null;
   createDate: Date | null;
   modifiedDate: Date | null;
 }
 export class EventViewModel extends ViewModel<$models.Event, $apiClients.EventApiClient, number> implements $models.Event  {
+  static DataSources = $models.Event.DataSources;
   
   constructor(initialData?: DeepPartial<$models.Event> | null) {
     super($metadata.Event, new $apiClients.EventApiClient(), initialData)
@@ -110,9 +122,32 @@ export class EventViewModel extends ViewModel<$models.Event, $apiClients.EventAp
 defineProps(EventViewModel, $metadata.Event)
 
 export class EventListViewModel extends ListViewModel<$models.Event, $apiClients.EventApiClient, EventViewModel> {
+  static DataSources = $models.Event.DataSources;
   
   constructor() {
     super($metadata.Event, new $apiClients.EventApiClient())
+  }
+}
+
+
+export interface EventTypeDefinitionViewModel extends $models.EventTypeDefinition {
+  eventTypeDefinitionId: number | null;
+  name: string | null;
+  description: string | null;
+  isActive: boolean | null;
+}
+export class EventTypeDefinitionViewModel extends ViewModel<$models.EventTypeDefinition, $apiClients.EventTypeDefinitionApiClient, number> implements $models.EventTypeDefinition  {
+  
+  constructor(initialData?: DeepPartial<$models.EventTypeDefinition> | null) {
+    super($metadata.EventTypeDefinition, new $apiClients.EventTypeDefinitionApiClient(), initialData)
+  }
+}
+defineProps(EventTypeDefinitionViewModel, $metadata.EventTypeDefinition)
+
+export class EventTypeDefinitionListViewModel extends ListViewModel<$models.EventTypeDefinition, $apiClients.EventTypeDefinitionApiClient, EventTypeDefinitionViewModel> {
+  
+  constructor() {
+    super($metadata.EventTypeDefinition, new $apiClients.EventTypeDefinitionApiClient())
   }
 }
 
@@ -311,6 +346,7 @@ const viewModelTypeLookup = ViewModel.typeLookup = {
   AuditLogProperty: AuditLogPropertyViewModel,
   Car: CarViewModel,
   Event: EventViewModel,
+  EventTypeDefinition: EventTypeDefinitionViewModel,
   Role: RoleViewModel,
   User: UserViewModel,
   UserRole: UserRoleViewModel,
@@ -321,6 +357,7 @@ const listViewModelTypeLookup = ListViewModel.typeLookup = {
   AuditLogProperty: AuditLogPropertyListViewModel,
   Car: CarListViewModel,
   Event: EventListViewModel,
+  EventTypeDefinition: EventTypeDefinitionListViewModel,
   Role: RoleListViewModel,
   User: UserListViewModel,
   UserRole: UserRoleListViewModel,

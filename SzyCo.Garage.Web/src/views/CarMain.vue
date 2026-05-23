@@ -18,6 +18,46 @@
     <h2 class="text-h5 mb-4">Car Details</h2>
     <CarHero :car-id="carId" />
 
+    <!-- Event History -->
+    <h3 class="text-h6 mt-6 mb-3">Event History</h3>
+    <v-card v-if="eventList.$load.isLoading" class="pa-4">
+      <v-progress-circular indeterminate size="24" class="mr-2" />
+      Loading events...
+    </v-card>
+    <v-card
+      v-else-if="!eventList.$items.length"
+      class="pa-4"
+      variant="outlined"
+    >
+      <v-card-text>No events recorded for this car.</v-card-text>
+    </v-card>
+    <v-timeline v-else side="end" density="compact">
+      <v-timeline-item
+        v-for="event in eventList.$items"
+        :key="event.id!"
+        size="small"
+        dot-color="primary"
+      >
+        <v-card variant="outlined" class="mb-2">
+          <v-card-title class="text-subtitle-1">
+            {{ event.eventTypeDefinition?.name || "Event" }}
+          </v-card-title>
+          <v-card-subtitle>
+            {{ formatDate(event.createDate) }}
+          </v-card-subtitle>
+          <v-card-text v-if="parseJsonData(event.jsonData)">
+            <div
+              v-for="(value, key) in parseJsonData(event.jsonData)"
+              :key="String(key)"
+            >
+              <strong>{{ formatLabel(String(key)) }}:</strong>
+              {{ key === "cost" ? `$${value}` : value }}
+            </div>
+          </v-card-text>
+        </v-card>
+      </v-timeline-item>
+    </v-timeline>
+
     <!-- Edit Car Dialog -->
     <v-dialog v-model="editDialog" width="500">
       <v-card>
@@ -61,7 +101,7 @@
 import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import CarHero from "@/components/CarHero.vue";
-import { CarViewModel } from "@/viewmodels.g";
+import { CarViewModel, EventListViewModel } from "@/viewmodels.g";
 
 const route = useRoute();
 const router = useRouter();
@@ -70,6 +110,8 @@ const carId = Number(route.params.id);
 const editDialog = ref(false);
 const editCar = ref<CarViewModel>(new CarViewModel());
 const snackbar = ref({ show: false, message: "" });
+
+const eventList = new EventListViewModel();
 
 function goBack() {
   router.back();
@@ -80,14 +122,46 @@ onMounted(async () => {
   car.carId = carId;
   await car.$load();
   editCar.value = car;
+
+  eventList.$params.filter = { carId: carId };
+  await eventList.$load();
 });
+
+function formatDate(date: Date | string | null | undefined): string {
+  if (!date) return "";
+  const d = new Date(date);
+  return d.toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+}
+
+function parseJsonData(
+  jsonData: string | null | undefined,
+): Record<string, string> | null {
+  if (!jsonData) return null;
+  try {
+    const parsed = JSON.parse(jsonData) as Record<string, string>;
+    const nonEmpty: Record<string, string> = {};
+    for (const [k, v] of Object.entries(parsed)) {
+      if (v !== "" && v != null) nonEmpty[k] = String(v);
+    }
+    return Object.keys(nonEmpty).length > 0 ? nonEmpty : null;
+  } catch {
+    return null;
+  }
+}
+
+function formatLabel(key: string): string {
+  return key.replace(/([A-Z])/g, " $1").replace(/^./, (s) => s.toUpperCase());
+}
 
 async function submitEdit() {
   await editCar.value.$save();
   editDialog.value = false;
   snackbar.value.message = "Car updated!";
   snackbar.value.show = true;
-  // Reload car data instead of full page reload
   await editCar.value.$load();
 }
 
