@@ -19,10 +19,15 @@ env:
 permissions:
   contents: read
 
+concurrency:
+  group: production-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   build-and-test:
     name: Build and Test
     runs-on: ubuntu-latest
+    timeout-minutes: 20
 
     steps:
       - name: Checkout repository
@@ -39,6 +44,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: ${{ env.WEB_PROJECT_PATH }}/package-lock.json
 
       - name: Restore .NET tools
         if: hashFiles('.config/dotnet-tools.json') != ''
@@ -73,28 +80,30 @@ jobs:
         run: dotnet publish ${{ github.workspace }}/${{ env.WEB_PROJECT_PATH }}/SzyCo.Garage.Web.csproj --configuration Release --output ${{ env.PUBLISH_DIR }} --no-restore --no-build
 
       - name: Verify publish output
-        if: github.event_name != 'pull_request'
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
         run: ls -la "${{ env.PUBLISH_DIR }}"
 
       - name: Zip published app
-        if: github.event_name != 'pull_request'
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
         run: |
           cd "${{ env.PUBLISH_DIR }}"
           zip -r "${{ github.workspace }}/web-app.zip" .
 
       - name: Upload artifact for deployment
-        if: github.event_name != 'pull_request'
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
         uses: actions/upload-artifact@v4
         with:
           name: web-app
           path: ${{ github.workspace }}/web-app.zip
           if-no-files-found: error
+          retention-days: 1
 
   deploy-production:
     name: Deploy Production
     needs: build-and-test
     runs-on: ubuntu-latest
-    if: github.event_name != 'pull_request'
+    timeout-minutes: 10
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
 
     environment:
       name: production
