@@ -43,7 +43,7 @@ public class SmtpEmailService(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed to send email to {Recipient}", to);
+            logger.LogError(ex, "Failed to send email.");
             return new ItemResult(false, "Unable to send email right now.");
         }
     }
