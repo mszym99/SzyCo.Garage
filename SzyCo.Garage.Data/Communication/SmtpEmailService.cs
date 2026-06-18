@@ -65,7 +65,8 @@ public class SmtpEmailService(
                 }
                 else
                 {
-                    client.UseDefaultCredentials = true;
+                    client.UseDefaultCredentials = false;
+                    client.Credentials = null;
                 }
             }
 
