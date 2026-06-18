@@ -274,6 +274,25 @@ Vuetify 3 UI renders data
 - \`UserAdmin\` - Create/manage users and roles
 - \`ViewAuditLogs\` - Access audit log viewing
 
+### Email confirmation (`EmailConfirmed`)
+
+- The **Email Confirmed** column maps to ASP.NET Identity's \`AspNetUsers.EmailConfirmed\` flag.
+- It is set to \`true\` only when the user successfully opens a valid confirmation link handled by \`/ConfirmEmail\`.
+- Flow is implemented in:
+  - \`SzyCo.Garage.Web/Pages/Register.cshtml.cs\` (sends confirmation request after registration)
+  - \`SzyCo.Garage.Data/Auth/UserManagementService.cs\` (generates token + confirmation URL)
+  - \`SzyCo.Garage.Web/Pages/ConfirmEmail.cshtml.cs\` (calls \`UserManager.ConfirmEmailAsync\`)
+
+To make this operational outside development, configure \`Communication:Email\` in \`SzyCo.Garage.Web/appsettings.json\` (or environment variables).  
+Use either:
+- SMTP host configuration (\`SmtpHost\`, \`SmtpPort\`, optional credentials), or
+- \`PickupDirectory\` for local/test mail-drop behavior.
+
+Suggested follow-up issues:
+- Enforce confirmed email at sign-in (\`SignIn.RequireConfirmedAccount = true\`) when rollout is ready.
+- Add explicit admin UI action to resend confirmation from the user list.
+- Add integration test coverage for end-to-end confirmation flow.
+
 **Authorization checks:**
 - Backend: \`[Edit(nameof(Permission.UserAdmin))]\` attributes on models
 - Frontend: \`can(Permission.UserAdmin)\` helper in components

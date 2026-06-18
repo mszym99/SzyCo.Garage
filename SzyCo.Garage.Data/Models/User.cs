@@ -19,6 +19,7 @@ public class User : IdentityUser
     [Read] // Email readonly - sourced from external identity providers
     public override string? Email { get; set; }
 
+    [Description("True after the user confirms ownership of their email address using the confirmation link.")]
     [Read]
     public override bool EmailConfirmed { get; set; }
 

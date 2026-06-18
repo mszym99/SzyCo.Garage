@@ -578,6 +578,7 @@ export const User = domain.types.User = {
     emailConfirmed: {
       name: "emailConfirmed",
       displayName: "Email Confirmed",
+      description: "True after the user confirms ownership of their email address using the confirmation link.",
       type: "boolean",
       role: "value",
       dontSerialize: true,

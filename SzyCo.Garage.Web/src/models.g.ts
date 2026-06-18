@@ -227,6 +227,8 @@ export interface User extends Model<typeof metadata.User> {
   fullName: string | null
   userName: string | null
   email: string | null
+  
+  /** True after the user confirms ownership of their email address using the confirmation link. */
   emailConfirmed: boolean | null
   
   /** If set, the user will be blocked from signing in until this date. */
