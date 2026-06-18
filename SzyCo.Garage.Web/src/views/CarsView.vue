@@ -18,9 +18,10 @@ onMounted(() => {
 <template>
   <div class="home">
     <h1>My Garage</h1>
-    <CarForm @saved="carList.$load" />
-
-    <EventForm :carList="carList" />
+    <div class="d-flex flex-wrap align-center ga-2 mb-4">
+      <CarForm @saved="carList.$load" />
+      <EventForm :car-list="carList" />
+    </div>
 
     <div class="car-list mt-6" style="align-items: flex-start">
       <CarCard :cars="carList.$items" />

@@ -1,20 +1,19 @@
 <template>
   <v-container class="pa-6">
-    <v-btn
-      prepend-icon="mdi-arrow-left"
-      class="mb-4"
-      color="primary"
-      variant="outlined"
-      @click="goBack"
-    >
-      Back to Car List
-    </v-btn>
+    <div class="d-flex flex-wrap align-center ga-2 mb-4">
+      <v-btn
+        prepend-icon="mdi-arrow-left"
+        color="primary"
+        variant="outlined"
+        @click="goBack"
+      >
+        Back to Car List
+      </v-btn>
 
-    <v-btn @click="removeCar" class="mb-4" color="red">Remove Car</v-btn>
-    <v-btn @click="editDialog = true" class="mb-4" color="secondary"
-      >Edit Car</v-btn
-    >
-
+      <v-btn color="red" @click="removeCar">Remove Car</v-btn>
+      <v-btn color="secondary" @click="editDialog = true">Edit Car</v-btn>
+      <EventForm :car-list="carList" @saved="eventList.$load()" />
+    </div>
     <h2 class="text-h5 mb-4">Car Details</h2>
     <CarHero :car-id="carId" />
 
@@ -77,7 +76,7 @@
     </v-dialog>
 
     <!-- Snackbar -->
-    <v-snackbar v-model="snackbar.show" :timeout="3000" color="success">
+    <v-snackbar v-model="snackbar.show" :timeout="3000" :color="snackbar.color">
       {{ snackbar.message }}
     </v-snackbar>
     <!-- Confirm Delete Dialog -->
@@ -101,7 +100,13 @@
 import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import CarHero from "@/components/CarHero.vue";
-import { CarViewModel, EventListViewModel } from "@/viewmodels.g";
+import EventForm from "@/components/EventForm.vue";
+import {
+  CarListViewModel,
+  CarViewModel,
+  EventViewModel,
+  EventListViewModel,
+} from "@/viewmodels.g";
 
 const route = useRoute();
 const router = useRouter();
@@ -109,8 +114,13 @@ const carId = Number(route.params.id);
 
 const editDialog = ref(false);
 const editCar = ref<CarViewModel>(new CarViewModel());
-const snackbar = ref({ show: false, message: "" });
+const snackbar = ref({
+  show: false,
+  message: "",
+  color: "success",
+});
 
+const carList = new CarListViewModel();
 const eventList = new EventListViewModel();
 const parsedEventDataCache = new WeakMap<
   object,
@@ -124,11 +134,12 @@ function goBack() {
 onMounted(async () => {
   const car = new CarViewModel();
   car.carId = carId;
-  await car.$load();
-  editCar.value = car;
+  carList.$params.filter = { carId };
 
   eventList.$params.filter = { carId: carId };
-  await eventList.$load();
+
+  await Promise.all([car.$load(), carList.$load(), eventList.$load()]);
+  editCar.value = car;
 });
 
 function formatDate(date: Date | string | null | undefined): string {
@@ -177,6 +188,7 @@ async function submitEdit() {
   await editCar.value.$save();
   editDialog.value = false;
   snackbar.value.message = "Car updated!";
+  snackbar.value.color = "success";
   snackbar.value.show = true;
   await editCar.value.$load();
 }
@@ -187,12 +199,35 @@ function removeCar() {
   confirmDeleteDialog.value = true;
 }
 
-function confirmRemoveCar() {
-  const car = new CarViewModel();
-  car.carId = carId;
-  car.$delete().then(() => {
+async function confirmRemoveCar() {
+  try {
+    const eventIds = eventList.$items
+      .map((e) => e.id)
+      .filter((id) => id != null);
+
+    // Delete dependent events first to avoid FK constraint failures when deleting a car.
+    await Promise.all(
+      eventIds.map(async (id) => {
+        const event = new EventViewModel();
+        event.id = id;
+        await event.$delete();
+      }),
+    );
+
+    const car = new CarViewModel();
+    car.carId = carId;
+    await car.$delete();
+
     confirmDeleteDialog.value = false;
+    snackbar.value.message = "Car removed.";
+    snackbar.value.color = "success";
+    snackbar.value.show = true;
     router.back();
-  });
+  } catch (error) {
+    console.error("Error deleting car:", error);
+    snackbar.value.message = "Failed to remove car. Please try again.";
+    snackbar.value.color = "error";
+    snackbar.value.show = true;
+  }
 }
 </script>

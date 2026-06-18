@@ -1,10 +1,10 @@
 import { mount, flushPromises, mockEndpoint } from "@/test-utils";
 
 import { VTextField } from "vuetify/components";
-import WidgetEdit from "./WidgetEdit.vue";
+import WidgetEditView from "./WidgetEditView.vue";
 import { Widget, WidgetCategory } from "@/models.g";
 
-describe("WidgetEdit.vue", () => {
+describe("WidgetEditView.vue", () => {
   it("loads user id 1", async () => {
     // Arrange
     mockEndpoint("/Widget/get", () => ({
@@ -17,7 +17,7 @@ describe("WidgetEdit.vue", () => {
     }));
 
     // Act
-    const wrapper = mount(WidgetEdit, { props: { id: 1 } });
+    const wrapper = mount(WidgetEditView, { props: { id: 1 } });
     await flushPromises();
 
     // Assert
