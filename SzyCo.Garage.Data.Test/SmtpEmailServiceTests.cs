@@ -6,6 +6,8 @@ namespace SzyCo.Garage.Data.Test;
 
 public class SmtpEmailServiceTests
 {
+    private const string PickupDirectoryTestFolder = "SzyCoGarageEmailTests";
+
     [Fact]
     public async Task SendEmailAsync_ReturnsFailureWhenDisabled()
     {
@@ -26,7 +28,7 @@ public class SmtpEmailServiceTests
     [Fact]
     public async Task SendEmailAsync_WritesEmailToPickupDirectory()
     {
-        var pickupDirectory = Path.Combine(Path.GetTempPath(), "SzyCoGarageEmailTests", Guid.NewGuid().ToString("N"));
+        var pickupDirectory = Path.Combine(Path.GetTempPath(), PickupDirectoryTestFolder, Guid.NewGuid().ToString("N"));
         try
         {
             var service = new SmtpEmailService(

@@ -75,7 +75,7 @@ public class SmtpEmailService(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed to send email to {EmailAddress}", to);
+            logger.LogError(ex, "Failed to send email.");
             return new ItemResult(false, "Failed to send email. Check email configuration and logs.");
         }
     }
