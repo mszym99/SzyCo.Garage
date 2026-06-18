@@ -62,6 +62,39 @@ Update the connection string in \`SzyCo.Garage.Web/appsettings.json\`:
 
 For production, use environment variables or Azure Key Vault instead of hardcoding credentials.
 
+### 2a. Configure Email (Staging/Production)
+
+By default, Development uses a no-op email sender for local debugging.
+Staging/Production use SMTP settings from `Communication:Smtp`.
+
+Example configuration in `SzyCo.Garage.Web/appsettings.json`:
+
+```json
+"Communication": {
+  "Smtp": {
+    "Enabled": true,
+    "Host": "smtp.example.com",
+    "Port": 587,
+    "EnableSsl": true,
+    "Username": "smtp-user",
+    "Password": "smtp-password",
+    "FromAddress": "noreply@example.com",
+    "FromName": "SzyCo Garage"
+  }
+}
+```
+
+For local non-production validation of the SMTP service without an external provider,
+set `PickupDirectoryLocation` to a writable folder and run with `ASPNETCORE_ENVIRONMENT=Staging`.
+The app will write `.eml` files there instead of connecting to an SMTP server.
+
+Use User Secrets for credentials:
+
+```bash
+cd SzyCo.Garage.Web
+dotnet user-secrets set "Communication:Smtp:Password" "<your-smtp-password>"
+```
+
 ### 3. Install Dependencies
 
 **Backend (NuGet):**

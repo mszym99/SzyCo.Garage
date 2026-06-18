@@ -62,7 +62,15 @@ services
 
 builder.ConfigureAuthentication();
 
-services.AddTransient<IEmailService, NoOpEmailService>();
+services.Configure<SmtpEmailOptions>(builder.Configuration.GetSection("Communication:Smtp"));
+if (builder.Environment.IsDevelopment())
+{
+    services.AddTransient<IEmailService, NoOpEmailService>();
+}
+else
+{
+    services.AddTransient<IEmailService, SmtpEmailService>();
+}
 
 services.AddSwaggerGen(c =>
 {
