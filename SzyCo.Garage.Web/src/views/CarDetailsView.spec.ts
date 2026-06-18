@@ -1,9 +1,11 @@
-import carMainSource from "./CarMain.vue?raw";
+import carDetailsViewSource from "./CarDetailsView.vue?raw";
 
-describe("CarMain.vue", () => {
+describe("CarDetailsView.vue", () => {
   it("keeps Edit Car field order aligned with Add Car", () => {
-    const editDialogStart = carMainSource.indexOf("<!-- Edit Car Dialog -->");
-    const editDialogTemplate = carMainSource.slice(editDialogStart);
+    const editDialogStart = carDetailsViewSource.indexOf(
+      "<!-- Edit Car Dialog -->",
+    );
+    const editDialogTemplate = carDetailsViewSource.slice(editDialogStart);
     const cardTextStart = editDialogTemplate.indexOf("<v-card-text>");
     const cardTextEnd = editDialogTemplate.indexOf("</v-card-text>");
     const fieldsSection = editDialogTemplate.slice(cardTextStart, cardTextEnd);

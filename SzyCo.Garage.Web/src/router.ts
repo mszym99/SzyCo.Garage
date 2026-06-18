@@ -11,26 +11,26 @@ const router = createRouter({
   routes: [
     {
       path: "/",
-      component: () => import("./views/Car.vue"),
+      component: () => import("./views/CarsView.vue"),
     },
     {
       path: "/car/:id",
       name: "car",
-      component: () => import("@/views/CarMain.vue"),
+      component: () => import("@/views/CarDetailsView.vue"),
     },
     {
       path: "/admin",
-      component: () => import("./views/Admin.vue"),
+      component: () => import("./views/AdminView.vue"),
     },
     {
       path: "/user/:id",
       alias: "/admin/User/edit/:id", // Override coalesce admin page
       props: true,
-      component: () => import("./views/UserProfile.vue"),
+      component: () => import("./views/UserProfileView.vue"),
     },
     {
       path: "/openapi",
-      component: () => import("./views/OpenAPI.vue"),
+      component: () => import("./views/OpenApiView.vue"),
     },
 
     // Coalesce admin routes

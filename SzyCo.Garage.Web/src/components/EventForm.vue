@@ -13,7 +13,7 @@
       <v-card-title>Add New Event</v-card-title>
 
       <v-card-text>
-        <v-form v-model="valid" ref="form" lazy-validation>
+        <v-form ref="form" v-model="valid" lazy-validation>
           <v-select
             v-model="eventForm.CarId"
             :items="carOptions"
