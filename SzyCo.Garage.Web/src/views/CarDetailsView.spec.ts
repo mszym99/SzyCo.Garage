@@ -1,6 +1,18 @@
 import carDetailsViewSource from "./CarDetailsView.vue?raw";
 
 describe("CarDetailsView.vue", () => {
+  it("shows a total event history cost above event history", () => {
+    const totalCostIndex = carDetailsViewSource.indexOf(
+      ':total-event-history-cost="totalEventHistoryCost"',
+    );
+    const eventHistoryIndex = carDetailsViewSource.indexOf("Event History");
+
+    expect(totalCostIndex).toBeGreaterThan(-1);
+    expect(carDetailsViewSource).toContain("totalEventHistoryCost");
+    expect(carDetailsViewSource).toContain("car.value.totalEventHistoryCost");
+    expect(totalCostIndex).toBeLessThan(eventHistoryIndex);
+  });
+
   it("keeps Edit Car field order aligned with Add Car", () => {
     const editDialogStart = carDetailsViewSource.indexOf(
       "<!-- Edit Car Dialog -->",

@@ -19,13 +19,19 @@ public class Car
 
     public ICollection<Event>? Events { get; set; }
 
+    [NotMapped]
+    [Read]
+    public decimal TotalEventHistoryCost => Events?.Sum(e => e.Cost) ?? 0m;
+
     [DefaultDataSource]
     public class MyGarage : AppDataSource<Car>
     {
         public MyGarage(CrudContext<AppDbContext> context) : base(context) { }
 
         public override IQueryable<Car> GetQuery(IDataSourceParameters parameters)
-            => Db.Cars.Where(f => f.UserId == User.GetUserId());
+            => Db.Cars
+                .Include(c => c.Events)
+                .Where(f => f.UserId == User.GetUserId());
     }
 
     public class CarBehaviors : AppBehaviors<Car>

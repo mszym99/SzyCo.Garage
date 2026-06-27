@@ -342,6 +342,13 @@ export const Car = domain.types.Car = {
       get inverseNavigation() { return (domain.types.Event as ModelType & { name: "Event" }).props.car as ModelReferenceNavigationProperty },
       dontSerialize: true,
     },
+    totalEventHistoryCost: {
+      name: "totalEventHistoryCost",
+      displayName: "Total Event History Cost",
+      type: "number",
+      role: "value",
+      dontSerialize: true,
+    },
   },
   methods: {
   },
@@ -443,6 +450,13 @@ export const Event = domain.types.Event = {
       dateKind: "datetime",
       noOffset: true,
       role: "value",
+    },
+    cost: {
+      name: "cost",
+      displayName: "Cost",
+      type: "number",
+      role: "value",
+      dontSerialize: true,
     },
   },
   methods: {
