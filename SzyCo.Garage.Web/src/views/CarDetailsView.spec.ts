@@ -36,4 +36,11 @@ describe("CarDetailsView.vue", () => {
     expect(makeIndex).toBeLessThan(modelIndex);
     expect(modelIndex).toBeLessThan(colorIndex);
   });
+
+  it("refreshes the car hero after saving edits", () => {
+    expect(carDetailsViewSource).toContain("<CarHero");
+    expect(carDetailsViewSource).toContain(':car-id="carId"');
+    expect(carDetailsViewSource).toContain(':refresh-key="carRefreshKey"');
+    expect(carDetailsViewSource).toContain("carRefreshKey.value += 1");
+  });
 });

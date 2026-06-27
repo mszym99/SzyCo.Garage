@@ -18,24 +18,30 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
-import { useRoute } from "vue-router";
-import { CarListViewModel, CarViewModel } from "@/viewmodels.g";
+import { ref, watch } from "vue";
+import { CarViewModel } from "@/viewmodels.g";
+
+const props = withDefaults(
+  defineProps<{
+    carId: number;
+    totalEventHistoryCost: string;
+    refreshKey?: number;
+  }>(),
+  {
+    refreshKey: 0,
+  },
+);
 
 const car = ref<CarViewModel | null>(null);
-const route = useRoute();
 
-defineProps<{
-  totalEventHistoryCost: string;
-}>();
+async function loadCar() {
+  if (isNaN(props.carId)) return;
 
-onMounted(async () => {
-  const carId = Number(route.params.id);
-  if (isNaN(carId)) return;
+  const carVM = new CarViewModel();
+  carVM.carId = props.carId;
+  await carVM.$load();
+  car.value = carVM;
+}
 
-  const carList = new CarListViewModel();
-  await carList.$load();
-
-  car.value = carList.$items.find((c) => c.carId === carId) || null;
-});
+watch(() => [props.carId, props.refreshKey], loadCar, { immediate: true });
 </script>
