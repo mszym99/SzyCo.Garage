@@ -15,7 +15,7 @@
       <EventForm :car-list="carList" @saved="eventList.$load()" />
     </div>
     <h2 class="text-h5 mb-4">Car Details</h2>
-    <CarHero :car-id="carId" />
+    <CarHero :car-id="carId" :refresh-key="carRefreshKey" />
 
     <!-- Event History -->
     <h3 class="text-h6 mt-6 mb-3">Event History</h3>
@@ -114,6 +114,7 @@ const carId = Number(route.params.id);
 
 const editDialog = ref(false);
 const editCar = ref<CarViewModel>(new CarViewModel());
+const carRefreshKey = ref(0);
 const snackbar = ref({
   show: false,
   message: "",
@@ -186,11 +187,12 @@ function formatLabel(key: string): string {
 
 async function submitEdit() {
   await editCar.value.$save();
+  await editCar.value.$load();
+  carRefreshKey.value += 1;
   editDialog.value = false;
   snackbar.value.message = "Car updated!";
   snackbar.value.color = "success";
   snackbar.value.show = true;
-  await editCar.value.$load();
 }
 
 const confirmDeleteDialog = ref(false);

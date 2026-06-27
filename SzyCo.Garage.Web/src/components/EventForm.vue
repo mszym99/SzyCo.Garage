@@ -87,6 +87,19 @@ const replacementFields = ref({
   Cost: "",
 });
 
+function resetForm() {
+  eventForm.value = {
+    CarId: null,
+    EventTypeId: null,
+  };
+  replacementFields.value = {
+    PartName: "",
+    Reason: "",
+    Cost: "",
+  };
+  valid.value = false;
+}
+
 const requiredRule = [(v: unknown) => !!v || "This field is required"];
 
 // Load event types from backend
@@ -149,6 +162,7 @@ const saveEvent = async () => {
   try {
     await eventVM.$save();
     dialog.value = false;
+    resetForm();
     emit("saved");
   } catch (err) {
     console.error("Error saving event:", err);
