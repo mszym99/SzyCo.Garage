@@ -128,7 +128,9 @@ const snackbar = ref({
 const carList = new CarListViewModel();
 const eventList = new EventListViewModel();
 const car = ref<CarViewModel>(new CarViewModel());
-let parsedEventDataCache = new WeakMap<object, Record<string, string> | null>();
+const parsedEventDataCache = ref(
+  new WeakMap<object, Record<string, string> | null>(),
+);
 
 const totalEventHistoryCost = computed(() =>
   formatCurrency(car.value.totalEventHistoryCost ?? 0),
@@ -161,12 +163,12 @@ function formatDate(date: Date | string | null | undefined): string {
 function getParsedEventData(event: {
   jsonData: string | null | undefined;
 }): Record<string, string> | null {
-  if (parsedEventDataCache.has(event)) {
-    return parsedEventDataCache.get(event) ?? null;
+  if (parsedEventDataCache.value.has(event)) {
+    return parsedEventDataCache.value.get(event) ?? null;
   }
 
   const parsedData = parseJsonData(event.jsonData);
-  parsedEventDataCache.set(event, parsedData);
+  parsedEventDataCache.value.set(event, parsedData);
   return parsedData;
 }
 
@@ -211,7 +213,10 @@ async function submitEdit() {
 }
 
 async function refreshEvents() {
-  parsedEventDataCache = new WeakMap<object, Record<string, string> | null>();
+  parsedEventDataCache.value = new WeakMap<
+    object,
+    Record<string, string> | null
+  >();
   await Promise.all([eventList.$load(), car.value.$load()]);
 }
 
