@@ -92,6 +92,7 @@ namespace SzyCo.Garage.Web.Models
         public string Make { get; set; }
         public string Model { get; set; }
         public string Color { get; set; }
+        public decimal? TotalEventHistoryCost { get; set; }
         public SzyCo.Garage.Web.Models.UserResponse User { get; set; }
         public System.Collections.Generic.ICollection<SzyCo.Garage.Web.Models.EventResponse> Events { get; set; }
 
@@ -109,6 +110,7 @@ namespace SzyCo.Garage.Web.Models
             this.Make = obj.Make;
             this.Model = obj.Model;
             this.Color = obj.Color;
+            this.TotalEventHistoryCost = obj.TotalEventHistoryCost;
             if (tree == null || tree[nameof(this.User)] != null)
                 this.User = obj.User.MapToDto<SzyCo.Garage.Data.Models.User, UserResponse>(context, tree?[nameof(this.User)]);
 

@@ -7,6 +7,10 @@
         <p>
           <strong>Color:</strong> {{ car.color || "No description provided." }}
         </p>
+        <p>
+          <strong>Total Event History Cost:</strong>
+          {{ totalEventHistoryCost }}
+        </p>
       </v-card-text>
     </v-card>
     <v-alert v-else type="info">Loading car data...</v-alert>
@@ -20,6 +24,10 @@ import { CarListViewModel, CarViewModel } from "@/viewmodels.g";
 
 const car = ref<CarViewModel | null>(null);
 const route = useRoute();
+
+defineProps<{
+  totalEventHistoryCost: string;
+}>();
 
 onMounted(async () => {
   const carId = Number(route.params.id);

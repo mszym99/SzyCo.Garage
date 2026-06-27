@@ -2,6 +2,11 @@ namespace SzyCo.Garage.Data.Models;
 
 public class Event
 {
+    private static readonly JsonSerializerOptions JsonDataSerializerOptions = new()
+    {
+        PropertyNameCaseInsensitive = true,
+    };
+
     public int Id { get; set; }
 
     [ForeignKey(nameof(Car))]
@@ -15,6 +20,52 @@ public class Event
     public string JsonData { get; set; } = string.Empty;
     public DateTime CreateDate { get; set; } = DateTime.UtcNow;
     public DateTime ModifiedDate { get; set; } = DateTime.UtcNow;
+
+    [NotMapped]
+    [Read]
+    public decimal Cost => GetCostFromJsonData(JsonData);
+
+    public static decimal GetCostFromJsonData(string? jsonData)
+    {
+        if (string.IsNullOrWhiteSpace(jsonData)) return 0m;
+
+        try
+        {
+            var eventData = JsonSerializer.Deserialize<EventJsonData>(jsonData, JsonDataSerializerOptions);
+            return eventData?.GetCost() ?? 0m;
+        }
+        catch (JsonException)
+        {
+            return 0m;
+        }
+    }
+
+    private sealed class EventJsonData
+    {
+        public JsonElement? Cost { get; set; }
+
+        public decimal GetCost()
+        {
+            if (Cost is not { } cost) return 0m;
+
+            return cost.ValueKind switch
+            {
+                JsonValueKind.Number when cost.TryGetDecimal(out var value) => value,
+                JsonValueKind.String => ParseCost(cost.GetString()),
+                _ => 0m,
+            };
+        }
+
+        private static decimal ParseCost(string? cost)
+        {
+            if (string.IsNullOrWhiteSpace(cost)) return 0m;
+
+            var normalized = cost.Replace("$", string.Empty).Replace(",", string.Empty);
+            return decimal.TryParse(normalized, NumberStyles.Number, CultureInfo.InvariantCulture, out var value)
+                ? value
+                : 0m;
+        }
+    }
 
     [DefaultDataSource]
     public class MyEvents : AppDataSource<Event>

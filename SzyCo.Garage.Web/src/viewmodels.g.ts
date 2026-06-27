@@ -76,6 +76,7 @@ export interface CarViewModel extends $models.Car {
   color: string | null;
   get events(): ViewModelCollection<EventViewModel, $models.Event>;
   set events(value: (EventViewModel | $models.Event)[] | null);
+  totalEventHistoryCost: number | null;
 }
 export class CarViewModel extends ViewModel<$models.Car, $apiClients.CarApiClient, number> implements $models.Car  {
   static DataSources = $models.Car.DataSources;
@@ -111,6 +112,7 @@ export interface EventViewModel extends $models.Event {
   jsonData: string | null;
   createDate: Date | null;
   modifiedDate: Date | null;
+  cost: number | null;
 }
 export class EventViewModel extends ViewModel<$models.Event, $apiClients.EventApiClient, number> implements $models.Event  {
   static DataSources = $models.Event.DataSources;
