@@ -88,6 +88,7 @@ namespace SzyCo.Garage.Web.Models
         public string JsonData { get; set; }
         public System.DateTime? CreateDate { get; set; }
         public System.DateTime? ModifiedDate { get; set; }
+        public decimal? Cost { get; set; }
         public SzyCo.Garage.Web.Models.CarResponse Car { get; set; }
         public SzyCo.Garage.Web.Models.EventTypeDefinitionResponse EventTypeDefinition { get; set; }
 
@@ -105,6 +106,7 @@ namespace SzyCo.Garage.Web.Models
             this.JsonData = obj.JsonData;
             this.CreateDate = obj.CreateDate;
             this.ModifiedDate = obj.ModifiedDate;
+            this.Cost = obj.Cost;
             if (tree == null || tree[nameof(this.Car)] != null)
                 this.Car = obj.Car.MapToDto<SzyCo.Garage.Data.Models.Car, CarResponse>(context, tree?[nameof(this.Car)]);
 

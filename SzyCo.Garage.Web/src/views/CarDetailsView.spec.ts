@@ -1,6 +1,18 @@
 import carDetailsViewSource from "./CarDetailsView.vue?raw";
 
 describe("CarDetailsView.vue", () => {
+  it("shows a total event history cost above event history", () => {
+    const totalCostIndex = carDetailsViewSource.indexOf(
+      ':total-event-history-cost="totalEventHistoryCost"',
+    );
+    const eventHistoryIndex = carDetailsViewSource.indexOf("Event History");
+
+    expect(totalCostIndex).toBeGreaterThan(-1);
+    expect(carDetailsViewSource).toContain("totalEventHistoryCost");
+    expect(carDetailsViewSource).toContain("car.value.totalEventHistoryCost");
+    expect(totalCostIndex).toBeLessThan(eventHistoryIndex);
+  });
+
   it("keeps Edit Car field order aligned with Add Car", () => {
     const editDialogStart = carDetailsViewSource.indexOf(
       "<!-- Edit Car Dialog -->",
@@ -26,9 +38,9 @@ describe("CarDetailsView.vue", () => {
   });
 
   it("refreshes the car hero after saving edits", () => {
-    expect(carDetailsViewSource).toContain(
-      '<CarHero :car-id="carId" :refresh-key="carRefreshKey" />',
-    );
+    expect(carDetailsViewSource).toContain("<CarHero");
+    expect(carDetailsViewSource).toContain(':car-id="carId"');
+    expect(carDetailsViewSource).toContain(':refresh-key="carRefreshKey"');
     expect(carDetailsViewSource).toContain("carRefreshKey.value += 1");
   });
 });

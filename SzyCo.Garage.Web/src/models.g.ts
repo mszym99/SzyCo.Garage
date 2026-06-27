@@ -101,6 +101,7 @@ export interface Car extends Model<typeof metadata.Car> {
   model: string | null
   color: string | null
   events: Event[] | null
+  totalEventHistoryCost: number | null
 }
 export class Car {
   
@@ -140,6 +141,7 @@ export interface Event extends Model<typeof metadata.Event> {
   jsonData: string | null
   createDate: Date | null
   modifiedDate: Date | null
+  cost: number | null
 }
 export class Event {
   

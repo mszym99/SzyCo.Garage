@@ -7,6 +7,10 @@
         <p>
           <strong>Color:</strong> {{ car.color || "No description provided." }}
         </p>
+        <p>
+          <strong>Total Event History Cost:</strong>
+          {{ totalEventHistoryCost }}
+        </p>
       </v-card-text>
     </v-card>
     <v-alert v-else type="info">Loading car data...</v-alert>
@@ -20,6 +24,7 @@ import { CarViewModel } from "@/viewmodels.g";
 const props = withDefaults(
   defineProps<{
     carId: number;
+    totalEventHistoryCost: string;
     refreshKey?: number;
   }>(),
   {

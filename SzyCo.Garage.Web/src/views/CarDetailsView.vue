@@ -12,10 +12,14 @@
 
       <v-btn color="red" @click="removeCar">Remove Car</v-btn>
       <v-btn color="secondary" @click="editDialog = true">Edit Car</v-btn>
-      <EventForm :car-list="carList" @saved="eventList.$load()" />
+      <EventForm :car-list="carList" @saved="refreshEvents" />
     </div>
     <h2 class="text-h5 mb-4">Car Details</h2>
-    <CarHero :car-id="carId" :refresh-key="carRefreshKey" />
+    <CarHero
+      :car-id="carId"
+      :refresh-key="carRefreshKey"
+      :total-event-history-cost="totalEventHistoryCost"
+    />
 
     <!-- Event History -->
     <h3 class="text-h6 mt-6 mb-3">Event History</h3>
@@ -97,7 +101,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { computed, ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import CarHero from "@/components/CarHero.vue";
 import EventForm from "@/components/EventForm.vue";
@@ -123,24 +127,25 @@ const snackbar = ref({
 
 const carList = new CarListViewModel();
 const eventList = new EventListViewModel();
-const parsedEventDataCache = new WeakMap<
-  object,
-  Record<string, string> | null
->();
+const car = ref<CarViewModel>(new CarViewModel());
+let parsedEventDataCache = new WeakMap<object, Record<string, string> | null>();
+
+const totalEventHistoryCost = computed(() =>
+  formatCurrency(car.value.totalEventHistoryCost ?? 0),
+);
 
 function goBack() {
   router.back();
 }
 
 onMounted(async () => {
-  const car = new CarViewModel();
-  car.carId = carId;
+  car.value.carId = carId;
   carList.$params.filter = { carId };
 
   eventList.$params.filter = { carId: carId };
 
-  await Promise.all([car.$load(), carList.$load(), eventList.$load()]);
-  editCar.value = car;
+  await Promise.all([car.value.$load(), carList.$load(), eventList.$load()]);
+  editCar.value = car.value;
 });
 
 function formatDate(date: Date | string | null | undefined): string {
@@ -151,22 +156,6 @@ function formatDate(date: Date | string | null | undefined): string {
     month: "short",
     day: "numeric",
   });
-}
-
-function parseJsonData(
-  jsonData: string | null | undefined,
-): Record<string, string> | null {
-  if (!jsonData) return null;
-  try {
-    const parsed = JSON.parse(jsonData) as Record<string, string>;
-    const nonEmpty: Record<string, string> = {};
-    for (const [k, v] of Object.entries(parsed)) {
-      if (v !== "" && v != null) nonEmpty[k] = String(v);
-    }
-    return Object.keys(nonEmpty).length > 0 ? nonEmpty : null;
-  } catch {
-    return null;
-  }
 }
 
 function getParsedEventData(event: {
@@ -181,6 +170,32 @@ function getParsedEventData(event: {
   return parsedData;
 }
 
+function parseJsonData(
+  jsonData: string | null | undefined,
+): Record<string, string> | null {
+  if (!jsonData) return null;
+
+  try {
+    const parsed = JSON.parse(jsonData) as Record<string, unknown>;
+    const nonEmpty: Record<string, string> = {};
+
+    for (const [key, value] of Object.entries(parsed)) {
+      if (value !== "" && value != null) nonEmpty[key] = String(value);
+    }
+
+    return Object.keys(nonEmpty).length > 0 ? nonEmpty : null;
+  } catch {
+    return null;
+  }
+}
+
+function formatCurrency(value: number): string {
+  return new Intl.NumberFormat(undefined, {
+    style: "currency",
+    currency: "USD",
+  }).format(value);
+}
+
 function formatLabel(key: string): string {
   return key.replace(/([A-Z])/g, " $1").replace(/^./, (s) => s.toUpperCase());
 }
@@ -193,6 +208,11 @@ async function submitEdit() {
   snackbar.value.message = "Car updated!";
   snackbar.value.color = "success";
   snackbar.value.show = true;
+}
+
+async function refreshEvents() {
+  parsedEventDataCache = new WeakMap<object, Record<string, string> | null>();
+  await Promise.all([eventList.$load(), car.value.$load()]);
 }
 
 const confirmDeleteDialog = ref(false);

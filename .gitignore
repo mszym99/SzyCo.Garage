@@ -378,3 +378,5 @@ appsettings.*.json
 
 # Local machine overrides (loaded optionally by Program.cs)
 SzyCo.Garage.Web/appsettings.localhost.json
+
+SzyCo.Garage.Web/src/types/components.d.ts
