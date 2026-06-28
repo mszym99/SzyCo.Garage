@@ -60,10 +60,39 @@ describe("CarDetailsView.vue", () => {
   it("copies an event as a new event for today", () => {
     expect(carDetailsViewSource).toContain("async function copyEvent");
     expect(carDetailsViewSource).toContain("EventServiceViewModel");
-    expect(carDetailsViewSource).toContain("const eventService = new EventServiceViewModel()");
+    expect(carDetailsViewSource).toContain(
+      "const eventService = new EventServiceViewModel()",
+    );
     expect(carDetailsViewSource).toContain(
       "await eventService.copyEventToToday(event.id)",
     );
     expect(carDetailsViewSource).toContain("Event copied to today.");
+  });
+
+  it("hides edit and event actions when a car is archived", () => {
+    expect(carDetailsViewSource).toContain("const isArchived = computed");
+    expect(carDetailsViewSource).toContain('v-if="!isArchived"');
+    expect(carDetailsViewSource).toContain(
+      "This vehicle has been sold and archived.",
+    );
+    expect(carDetailsViewSource).toContain("Sold vehicles are read-only.");
+  });
+
+  it("keeps car delete available when a car is archived", () => {
+    const removeCarClickIndex =
+      carDetailsViewSource.indexOf('@click="removeCar"');
+    const removeCarButtonStart = carDetailsViewSource.lastIndexOf(
+      "<v-btn",
+      removeCarClickIndex,
+    );
+    const removeCarButton = carDetailsViewSource.slice(
+      removeCarButtonStart,
+      removeCarClickIndex,
+    );
+
+    expect(removeCarClickIndex).toBeGreaterThan(-1);
+    expect(removeCarButton).not.toContain('v-if="!isArchived"');
+    expect(carDetailsViewSource).toContain("async function confirmRemoveCar");
+    expect(carDetailsViewSource).toContain("await car.$delete()");
   });
 });

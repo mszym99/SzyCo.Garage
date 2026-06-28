@@ -12,5 +12,7 @@ public class EventTypeDefinition
 
     public string? Description { get; set; }
 
+    public string JsonDefinition { get; set; } = "{}";
+
     public bool IsActive { get; set; } = true;
 }

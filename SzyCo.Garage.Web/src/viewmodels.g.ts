@@ -74,6 +74,7 @@ export interface CarViewModel extends $models.Car {
   make: string | null;
   model: string | null;
   color: string | null;
+  isArchived: boolean | null;
   get events(): ViewModelCollection<EventViewModel, $models.Event>;
   set events(value: (EventViewModel | $models.Event)[] | null);
   totalEventHistoryCost: number | null;
@@ -136,6 +137,7 @@ export interface EventTypeDefinitionViewModel extends $models.EventTypeDefinitio
   eventTypeDefinitionId: number | null;
   name: string | null;
   description: string | null;
+  jsonDefinition: string | null;
   isActive: boolean | null;
 }
 export class EventTypeDefinitionViewModel extends ViewModel<$models.EventTypeDefinition, $apiClients.EventTypeDefinitionApiClient, number> implements $models.EventTypeDefinition  {

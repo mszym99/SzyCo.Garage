@@ -100,6 +100,7 @@ export interface Car extends Model<typeof metadata.Car> {
   make: string | null
   model: string | null
   color: string | null
+  isArchived: boolean | null
   events: Event[] | null
   totalEventHistoryCost: number | null
 }
@@ -176,6 +177,7 @@ export interface EventTypeDefinition extends Model<typeof metadata.EventTypeDefi
   eventTypeDefinitionId: number | null
   name: string | null
   description: string | null
+  jsonDefinition: string | null
   isActive: boolean | null
 }
 export class EventTypeDefinition {

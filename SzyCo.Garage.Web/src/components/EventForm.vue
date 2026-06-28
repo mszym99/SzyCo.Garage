@@ -38,23 +38,39 @@
             required
           />
 
-          <div v-if="isReplacementEventType">
-            <v-text-field
-              v-model="replacementFields.PartName"
-              label="Part Name"
-              required
-            />
-            <v-text-field
-              v-model="replacementFields.Reason"
-              label="Reason for Replacement"
-            />
-            <v-text-field
-              v-model="replacementFields.Cost"
-              label="Cost"
-              prefix="$"
-              type="number"
-            />
-          </div>
+          <template v-if="selectedEventDefinitionFields.length">
+            <template
+              v-for="field in selectedEventDefinitionFields"
+              :key="field.name"
+            >
+              <v-select
+                v-if="isSelectField(field)"
+                v-model="eventFieldValues[field.name]"
+                :items="field.options"
+                :label="field.label"
+                :rules="rulesForField(field)"
+                :required="field.required"
+              />
+              <v-textarea
+                v-else-if="isTextareaField(field)"
+                v-model="eventFieldValues[field.name]"
+                :label="field.label"
+                :rules="rulesForField(field)"
+                :required="field.required"
+                auto-grow
+                rows="2"
+              />
+              <v-text-field
+                v-else
+                v-model="eventFieldValues[field.name]"
+                :label="field.label"
+                :prefix="prefixForField(field)"
+                :rules="rulesForField(field)"
+                :type="inputTypeForField(field)"
+                :required="field.required"
+              />
+            </template>
+          </template>
 
           <v-alert
             v-if="saveError"
@@ -99,6 +115,14 @@ type FormRef = {
   resetValidation?: () => void;
 };
 
+type EventFieldDefinition = {
+  name: string;
+  label: string;
+  type: string;
+  required: boolean;
+  options: string[];
+};
+
 const props = withDefaults(
   defineProps<{
     carList: CarListViewModel;
@@ -124,12 +148,7 @@ const eventForm = ref({
   eventTypeId: null as number | null,
 });
 
-const replacementFields = ref({
-  PartName: "",
-  Reason: "",
-  Cost: "",
-});
-
+const eventFieldValues = ref<Record<string, string>>({});
 const fallbackJsonData = ref("{}");
 
 const isEditing = computed(() => !!props.event?.id);
@@ -147,11 +166,7 @@ function resetForm({ resetValidation = true } = {}) {
     carId: getDefaultCarId(),
     eventTypeId: null,
   };
-  replacementFields.value = {
-    PartName: "",
-    Reason: "",
-    Cost: "",
-  };
+  eventFieldValues.value = {};
   fallbackJsonData.value = "{}";
   saveError.value = "";
   valid.value = Boolean(eventForm.value.carId && eventForm.value.eventTypeId);
@@ -179,24 +194,26 @@ const eventTypeOptions = computed(() => {
     }));
 });
 
-const selectedEventTypeName = computed(() => {
+const selectedEventTypeDefinition = computed(() => {
   if (!eventForm.value.eventTypeId) return null;
   const found = eventTypeList.$items.find(
     (et) => et.eventTypeDefinitionId === eventForm.value.eventTypeId,
   );
-  return found?.name ?? props.event?.eventTypeDefinition?.name ?? null;
+  return found ?? props.event?.eventTypeDefinition ?? null;
 });
 
-const isReplacementEventType = computed(
-  () => selectedEventTypeName.value?.toLowerCase() === "replacement",
+const selectedEventDefinitionFields = computed(() =>
+  parseEventDefinition(selectedEventTypeDefinition.value?.jsonDefinition),
 );
 
 const carOptions = computed(() => {
   if (!props.carList || !props.carList.$items?.length) return [];
-  return props.carList.$items.map((car) => ({
-    carId: car.carId!,
-    display: `${car.year} ${car.make} ${car.model} (${car.color})`,
-  }));
+  return props.carList.$items
+    .filter((car) => !car.isArchived || car.carId === eventForm.value.carId)
+    .map((car) => ({
+      carId: car.carId!,
+      display: `${car.year} ${car.make} ${car.model} (${car.color})`,
+    }));
 });
 
 const canSave = computed(
@@ -220,6 +237,23 @@ watch(
   },
 );
 
+watch(
+  () => eventForm.value.eventTypeId,
+  (newEventTypeId, oldEventTypeId) => {
+    if (!dialog.value || newEventTypeId === oldEventTypeId) return;
+
+    const parsedJsonData =
+      props.event?.eventTypeId === newEventTypeId
+        ? parseJsonData(props.event.jsonData)
+        : {};
+    eventFieldValues.value = getInitialEventFieldValues(parsedJsonData);
+  },
+);
+
+watch(selectedEventDefinitionFields, () => {
+  hydrateDefinitionFields();
+});
+
 watch(carOptions, () => {
   if (!dialog.value || eventForm.value.carId) return;
   eventForm.value.carId = getDefaultCarId();
@@ -236,12 +270,9 @@ function hydrateForm() {
     carId: props.event.carId ?? getDefaultCarId(),
     eventTypeId: props.event.eventTypeId,
   };
-  replacementFields.value = {
-    PartName: getStringField(parsedJsonData, "partName", "PartName"),
-    Reason: getStringField(parsedJsonData, "reason", "Reason"),
-    Cost: getStringField(parsedJsonData, "cost", "Cost"),
-  };
+  eventFieldValues.value = getInitialEventFieldValues(parsedJsonData);
   fallbackJsonData.value = props.event.jsonData?.trim() || "{}";
+  hydrateDefinitionFields(parsedJsonData);
   saveError.value = "";
   valid.value = Boolean(eventForm.value.carId && eventForm.value.eventTypeId);
 }
@@ -272,6 +303,120 @@ function getStringField(data: Record<string, unknown>, ...keys: string[]) {
   return "";
 }
 
+function getInitialEventFieldValues(data: Record<string, unknown>) {
+  const values: Record<string, string> = {};
+
+  for (const [key, value] of Object.entries(data)) {
+    if (value != null && typeof value !== "object") {
+      values[key] = String(value);
+    }
+  }
+
+  return values;
+}
+
+function hydrateDefinitionFields(data = parseJsonData(fallbackJsonData.value)) {
+  const values = { ...eventFieldValues.value };
+
+  for (const field of selectedEventDefinitionFields.value) {
+    if (values[field.name] == null || values[field.name] === "") {
+      values[field.name] = getStringField(
+        data,
+        field.name,
+        toPascalCase(field.name),
+      );
+    }
+  }
+
+  eventFieldValues.value = values;
+}
+
+function parseEventDefinition(
+  jsonDefinition: string | null | undefined,
+): EventFieldDefinition[] {
+  if (!jsonDefinition) return [];
+
+  try {
+    const parsed = JSON.parse(jsonDefinition) as {
+      fields?: unknown;
+    };
+
+    if (!Array.isArray(parsed.fields)) return [];
+
+    return parsed.fields
+      .map(normalizeEventFieldDefinition)
+      .filter((field): field is EventFieldDefinition => field != null);
+  } catch {
+    return [];
+  }
+}
+
+function normalizeEventFieldDefinition(
+  field: unknown,
+): EventFieldDefinition | null {
+  if (!field || typeof field !== "object") return null;
+
+  const rawField = field as Record<string, unknown>;
+  const name = typeof rawField.name === "string" ? rawField.name.trim() : "";
+  if (!name) return null;
+
+  const label =
+    typeof rawField.label === "string" && rawField.label.trim()
+      ? rawField.label.trim()
+      : formatFieldLabel(name);
+
+  const type =
+    typeof rawField.type === "string" && rawField.type.trim()
+      ? rawField.type.trim().toLowerCase()
+      : "text";
+
+  const options = Array.isArray(rawField.options)
+    ? rawField.options
+        .filter((option) => option != null)
+        .map((option) => String(option))
+    : [];
+
+  return {
+    name,
+    label,
+    type,
+    required: rawField.required === true,
+    options,
+  };
+}
+
+function formatFieldLabel(name: string) {
+  return name
+    .replace(/([A-Z])/g, " $1")
+    .replace(/^./, (first) => first.toUpperCase());
+}
+
+function toPascalCase(value: string) {
+  return value.charAt(0).toUpperCase() + value.slice(1);
+}
+
+function isSelectField(field: EventFieldDefinition) {
+  return field.type === "select" || field.type === "enum";
+}
+
+function isTextareaField(field: EventFieldDefinition) {
+  return field.type === "textarea";
+}
+
+function inputTypeForField(field: EventFieldDefinition) {
+  if (field.type === "date") return "date";
+  if (field.type === "number" || field.type === "currency") return "number";
+  return "text";
+}
+
+function prefixForField(field: EventFieldDefinition) {
+  return field.type === "currency" ? "$" : undefined;
+}
+
+function rulesForField(field: EventFieldDefinition) {
+  return field.required ? requiredRule : [];
+}
+
 const saveEvent = async () => {
   const validation = await form.value?.validate();
   if (validation && !validation.valid) return;
@@ -282,12 +427,10 @@ const saveEvent = async () => {
 
   let jsonData: Record<string, unknown> = {};
 
-  if (isReplacementEventType.value) {
-    jsonData = {
-      partName: replacementFields.value.PartName,
-      reason: replacementFields.value.Reason,
-      cost: replacementFields.value.Cost,
-    };
+  if (selectedEventDefinitionFields.value.length) {
+    for (const field of selectedEventDefinitionFields.value) {
+      jsonData[field.name] = eventFieldValues.value[field.name] ?? "";
+    }
   } else if (fallbackJsonData.value.trim()) {
     jsonData = parseJsonData(fallbackJsonData.value);
   }

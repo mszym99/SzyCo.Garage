@@ -17,6 +17,9 @@ public class Car
     public required string Model { get; set; }
     public required string Color { get; set; }
 
+    [Read]
+    public bool IsArchived { get; set; }
+
     public ICollection<Event>? Events { get; set; }
 
     [NotMapped]
@@ -47,13 +50,16 @@ public class Car
             {
                 // Server sets ownership — ignore any client-supplied value
                 item.UserId = userId;
+                item.IsArchived = false;
             }
             else
             {
                 // On update, verify the car belongs to the current user
                 if (oldItem?.UserId != userId) return "You can only edit your own cars.";
+                if (oldItem.IsArchived) return "Sold vehicles are read-only.";
                 // Prevent transferring ownership
                 item.UserId = userId;
+                item.IsArchived = oldItem.IsArchived;
             }
 
             return base.BeforeSave(kind, oldItem, item);
@@ -64,6 +70,12 @@ public class Car
             var userId = User.GetUserId();
             if (string.IsNullOrEmpty(userId)) return "Authentication required.";
             if (item.UserId != userId) return "You can only delete your own cars.";
+
+            var dependentEvents = Db.Events.Where(e => e.CarId == item.CarId).ToList();
+            if (dependentEvents.Count > 0)
+            {
+                Db.Events.RemoveRange(dependentEvents);
+            }
 
             return base.BeforeDelete(item);
         }

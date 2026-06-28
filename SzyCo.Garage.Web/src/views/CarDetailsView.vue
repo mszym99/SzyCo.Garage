@@ -19,6 +19,7 @@
         Remove Car
       </v-btn>
       <v-btn
+        v-if="!isArchived"
         prepend-icon="fa fa-pencil"
         color="secondary"
         variant="tonal"
@@ -27,6 +28,7 @@
         Edit Car
       </v-btn>
       <EventForm
+        v-if="!isArchived"
         :car-list="carList"
         :default-car-id="carId"
         @saved="handleEventSaved('Event added.')"
@@ -38,6 +40,15 @@
       :refresh-key="carRefreshKey"
       :total-event-history-cost="totalEventHistoryCost"
     />
+    <v-alert
+      v-if="isArchived"
+      class="mt-4"
+      type="info"
+      variant="tonal"
+      density="comfortable"
+    >
+      This vehicle has been sold and archived. Its history is read-only.
+    </v-alert>
 
     <!-- Event History -->
     <h3 class="text-h6 mt-6 mb-3">Event History</h3>
@@ -64,7 +75,7 @@
             <span class="event-card-name">
               {{ event.eventTypeDefinition?.name || "Event" }}
             </span>
-            <v-menu location="bottom end">
+            <v-menu v-if="!isArchived" location="bottom end">
               <template #activator="{ props: menuProps }">
                 <v-btn
                   v-bind="menuProps"
@@ -77,7 +88,11 @@
                   aria-label="Event actions"
                 />
               </template>
-              <v-list class="event-action-menu" density="compact" min-width="190">
+              <v-list
+                class="event-action-menu"
+                density="compact"
+                min-width="190"
+              >
                 <EventForm
                   :car-list="carList"
                   :event="event"
@@ -95,9 +110,7 @@
                 <v-list-item
                   prepend-icon="fa fa-copy"
                   :title="
-                    copyingEventId === event.id
-                      ? 'Copying...'
-                      : 'Copy to today'
+                    copyingEventId === event.id ? 'Copying...' : 'Copy to today'
                   "
                   :disabled="copyingEventId === event.id"
                   @click="copyEvent(event)"
@@ -120,7 +133,7 @@
               :key="String(key)"
             >
               <strong>{{ formatLabel(String(key)) }}:</strong>
-              {{ key === "cost" ? `$${value}` : value }}
+              {{ formatEventValue(String(key), value) }}
             </div>
           </v-card-text>
         </v-card>
@@ -223,6 +236,8 @@ const totalEventHistoryCost = computed(() =>
   formatCurrency(car.value.totalEventHistoryCost ?? 0),
 );
 
+const isArchived = computed(() => car.value.isArchived === true);
+
 const sortedEvents = computed(() =>
   [...eventList.$items].sort((a, b) => {
     const bTime = b.createDate ? new Date(b.createDate).getTime() : 0;
@@ -301,7 +316,19 @@ function formatLabel(key: string): string {
   return key.replace(/([A-Z])/g, " $1").replace(/^./, (s) => s.toUpperCase());
 }
 
+function formatEventValue(key: string, value: string): string {
+  const normalizedKey = key.toLowerCase();
+  return normalizedKey.includes("cost") || normalizedKey.includes("price")
+    ? `$${value}`
+    : value;
+}
+
 async function submitEdit() {
+  if (isArchived.value) {
+    showSnackbar("Sold vehicles are read-only.", "error");
+    return;
+  }
+
   await editCar.value.$save();
   await editCar.value.$load();
   carRefreshKey.value += 1;
@@ -315,6 +342,7 @@ async function refreshEvents() {
     Record<string, string> | null
   >();
   await Promise.all([eventList.$load(), car.value.$load()]);
+  carRefreshKey.value += 1;
 }
 
 async function handleEventSaved(message: string) {
@@ -323,6 +351,11 @@ async function handleEventSaved(message: string) {
 }
 
 async function copyEvent(event: EventViewModel) {
+  if (isArchived.value) {
+    showSnackbar("Sold vehicles are read-only.", "error");
+    return;
+  }
+
   if (event.id == null) {
     showSnackbar("Event is missing.", "error");
     return;
@@ -342,11 +375,21 @@ async function copyEvent(event: EventViewModel) {
 }
 
 function removeEvent(event: EventViewModel) {
+  if (isArchived.value) {
+    showSnackbar("Sold vehicles are read-only.", "error");
+    return;
+  }
+
   eventPendingDelete.value = event;
   confirmEventDeleteDialog.value = true;
 }
 
 async function confirmRemoveEvent() {
+  if (isArchived.value) {
+    showSnackbar("Sold vehicles are read-only.", "error");
+    return;
+  }
+
   const eventId = eventPendingDelete.value?.id;
   if (eventId == null) return;
 
@@ -379,19 +422,6 @@ function removeCar() {
 
 async function confirmRemoveCar() {
   try {
-    const eventIds = eventList.$items
-      .map((e) => e.id)
-      .filter((id) => id != null);
-
-    // Delete dependent events first to avoid FK constraint failures when deleting a car.
-    await Promise.all(
-      eventIds.map(async (id) => {
-        const event = new EventViewModel();
-        event.id = id;
-        await event.$delete();
-      }),
-    );
-
     const car = new CarViewModel();
     car.carId = carId;
     await car.$delete();

@@ -31,6 +31,7 @@ public class EventService
 
         if (sourceEvent == null) return "Event not found.";
         if (sourceEvent.Car.UserId != userId) return "You can only copy events for your own cars.";
+        if (sourceEvent.Car.IsArchived) return "Sold vehicles are read-only.";
 
         var now = DateTime.UtcNow;
         var copiedEvent = new Event
