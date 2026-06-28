@@ -1,5 +1,6 @@
 using IntelliTect.Coalesce;
 using IntelliTect.Coalesce.Models;
+using Microsoft.EntityFrameworkCore;
 using SzyCo.Garage.Data.Auth;
 using System.Security.Claims;
 
@@ -38,6 +39,20 @@ public class CarOwnershipTests : TestBase
         Db.Cars.Add(car);
         Db.SaveChanges();
         return car;
+    }
+
+    private EventTypeDefinition CreateEventType()
+    {
+        var eventType = new EventTypeDefinition
+        {
+            Name = "Replacement",
+            Description = "A part replacement",
+            JsonDefinition = "{}",
+            IsActive = true,
+        };
+        Db.EventTypeDefinitions.Add(eventType);
+        Db.SaveChanges();
+        return eventType;
     }
 
     [Fact]
@@ -110,6 +125,22 @@ public class CarOwnershipTests : TestBase
     }
 
     [Fact]
+    public void CarBehaviors_UpdateDeniedForArchivedCar()
+    {
+        // Arrange
+        SetCurrentUser(UserAId);
+        var behaviors = Mocker.CreateInstance<Car.CarBehaviors>();
+        var existingCar = new Car { UserId = UserAId, Year = 2024, Make = "Test", Model = "Car", Color = "Red", IsArchived = true };
+        var updatedCar = new Car { UserId = UserAId, Year = 2025, Make = "Test", Model = "Car", Color = "Red" };
+
+        // Act
+        var result = behaviors.BeforeSave(SaveKind.Update, existingCar, updatedCar);
+
+        // Assert
+        result.AssertError("Sold vehicles are read-only.");
+    }
+
+    [Fact]
     public void CarBehaviors_DeleteDeniedForOtherUsersCar()
     {
         // Arrange
@@ -122,6 +153,51 @@ public class CarOwnershipTests : TestBase
 
         // Assert
         result.AssertError("You can only delete your own cars.");
+    }
+
+    [Fact]
+    public void CarBehaviors_DeleteAllowedForArchivedCar()
+    {
+        // Arrange
+        SetCurrentUser(UserAId);
+        var behaviors = Mocker.CreateInstance<Car.CarBehaviors>();
+        var ownCar = new Car { UserId = UserAId, Year = 2024, Make = "Test", Model = "Car", Color = "Red", IsArchived = true };
+
+        // Act
+        var result = behaviors.BeforeDelete(ownCar);
+
+        // Assert
+        result.AssertSuccess();
+    }
+
+    [Fact]
+    public void CarBehaviors_DeleteRemovesDependentEvents()
+    {
+        // Arrange
+        var ownCar = CreateCar(UserAId);
+        ownCar.IsArchived = true;
+        var eventType = CreateEventType();
+        Db.Events.Add(new Event
+        {
+            CarId = ownCar.CarId,
+            EventTypeId = eventType.EventTypeDefinitionId,
+            JsonData = "{}",
+        });
+        Db.SaveChanges();
+        RefreshServices();
+
+        SetCurrentUser(UserAId);
+        var behaviors = Mocker.CreateInstance<Car.CarBehaviors>();
+        var archivedCar = Db.Cars.Single(c => c.CarId == ownCar.CarId);
+
+        // Act
+        var result = behaviors.BeforeDelete(archivedCar);
+
+        // Assert
+        result.AssertSuccess();
+        Assert.Contains(
+            Db.ChangeTracker.Entries<Event>(),
+            entry => entry.Entity.CarId == ownCar.CarId && entry.State == EntityState.Deleted);
     }
 
     [Fact]

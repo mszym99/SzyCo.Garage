@@ -326,6 +326,13 @@ export const Car = domain.types.Car = {
         required: val => (val != null && val !== '') || "Color is required.",
       }
     },
+    isArchived: {
+      name: "isArchived",
+      displayName: "Is Archived",
+      type: "boolean",
+      role: "value",
+      dontSerialize: true,
+    },
     events: {
       name: "events",
       displayName: "Events",
@@ -502,6 +509,15 @@ export const EventTypeDefinition = domain.types.EventTypeDefinition = {
       displayName: "Description",
       type: "string",
       role: "value",
+    },
+    jsonDefinition: {
+      name: "jsonDefinition",
+      displayName: "Json Definition",
+      type: "string",
+      role: "value",
+      rules: {
+        required: val => (val != null && val !== '') || "Json Definition is required.",
+      }
     },
     isActive: {
       name: "isActive",

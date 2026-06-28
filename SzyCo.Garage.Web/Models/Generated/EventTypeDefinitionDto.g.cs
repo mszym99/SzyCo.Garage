@@ -15,6 +15,7 @@ namespace SzyCo.Garage.Web.Models
         private int? _EventTypeDefinitionId;
         private string _Name;
         private string _Description;
+        private string _JsonDefinition;
         private bool? _IsActive;
 
         public int? EventTypeDefinitionId
@@ -31,6 +32,11 @@ namespace SzyCo.Garage.Web.Models
         {
             get => _Description;
             set { _Description = value; Changed(nameof(Description)); }
+        }
+        public string JsonDefinition
+        {
+            get => _JsonDefinition;
+            set { _JsonDefinition = value; Changed(nameof(JsonDefinition)); }
         }
         public bool? IsActive
         {
@@ -50,6 +56,7 @@ namespace SzyCo.Garage.Web.Models
             if (ShouldMapTo(nameof(EventTypeDefinitionId))) entity.EventTypeDefinitionId = (EventTypeDefinitionId ?? entity.EventTypeDefinitionId);
             if (ShouldMapTo(nameof(Name))) entity.Name = Name;
             if (ShouldMapTo(nameof(Description))) entity.Description = Description;
+            if (ShouldMapTo(nameof(JsonDefinition))) entity.JsonDefinition = JsonDefinition;
             if (ShouldMapTo(nameof(IsActive))) entity.IsActive = (IsActive ?? entity.IsActive);
         }
 
@@ -68,6 +75,7 @@ namespace SzyCo.Garage.Web.Models
             if (OnUpdate(entity, context)) return entity;
             if (ShouldMapTo(nameof(EventTypeDefinitionId))) entity.EventTypeDefinitionId = (EventTypeDefinitionId ?? entity.EventTypeDefinitionId);
             if (ShouldMapTo(nameof(Description))) entity.Description = Description;
+            if (ShouldMapTo(nameof(JsonDefinition))) entity.JsonDefinition = JsonDefinition;
             if (ShouldMapTo(nameof(IsActive))) entity.IsActive = (IsActive ?? entity.IsActive);
 
             return entity;
@@ -81,6 +89,7 @@ namespace SzyCo.Garage.Web.Models
         public int? EventTypeDefinitionId { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
+        public string JsonDefinition { get; set; }
         public bool? IsActive { get; set; }
 
         /// <summary>
@@ -94,6 +103,7 @@ namespace SzyCo.Garage.Web.Models
             this.EventTypeDefinitionId = obj.EventTypeDefinitionId;
             this.Name = obj.Name;
             this.Description = obj.Description;
+            this.JsonDefinition = obj.JsonDefinition;
             this.IsActive = obj.IsActive;
         }
     }

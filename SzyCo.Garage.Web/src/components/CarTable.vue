@@ -19,6 +19,12 @@
     <template #[`item.color`]="{ item }">
       {{ item.color || "No description provided." }}
     </template>
+    <template #[`item.status`]="{ item }">
+      <v-chip v-if="item.isArchived" color="info" size="small" variant="tonal">
+        Archived
+      </v-chip>
+      <span v-else>Active</span>
+    </template>
   </v-data-table>
 </template>
 
@@ -38,6 +44,7 @@ const headers = [
   { title: "Model", key: "model" },
   { title: "Year", key: "year" },
   { title: "Color", key: "color" },
+  { title: "Status", key: "status", sortable: false },
 ];
 
 function goToCar(_: MouseEvent, row: { item: CarViewModel }) {

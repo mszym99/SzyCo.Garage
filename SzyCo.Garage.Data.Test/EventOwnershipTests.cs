@@ -19,7 +19,7 @@ public class EventOwnershipTests : TestBase
         }, "test"));
     }
 
-    private Car CreateCar(string userId)
+    private Car CreateCar(string userId, bool isArchived = false)
     {
         // Ensure the user exists for FK constraint
         if (!Db.Users.Any(u => u.Id == userId))
@@ -35,18 +35,20 @@ public class EventOwnershipTests : TestBase
             Make = "Toyota",
             Model = "Camry",
             Color = "Blue",
+            IsArchived = isArchived,
         };
         Db.Cars.Add(car);
         Db.SaveChanges();
         return car;
     }
 
-    private EventTypeDefinition CreateEventType()
+    private EventTypeDefinition CreateEventType(string name = "Replacement", string? jsonDefinition = null)
     {
         var eventType = new EventTypeDefinition
         {
-            Name = "Replacement",
+            Name = name,
             Description = "A part replacement",
+            JsonDefinition = jsonDefinition ?? "{}",
             IsActive = true,
         };
         Db.EventTypeDefinitions.Add(eventType);
@@ -103,6 +105,127 @@ public class EventOwnershipTests : TestBase
     }
 
     [Fact]
+    public void EventBehaviors_CreateDeniedForArchivedCar()
+    {
+        // Arrange
+        var ownArchivedCar = CreateCar(UserAId, isArchived: true);
+        var eventType = CreateEventType();
+        RefreshServices();
+
+        SetCurrentUser(UserAId);
+        var behaviors = Mocker.CreateInstance<Event.EventBehaviors>();
+        var newEvent = new Event
+        {
+            CarId = ownArchivedCar.CarId,
+            EventTypeId = eventType.EventTypeDefinitionId,
+            JsonData = "{}",
+        };
+
+        // Act
+        var result = behaviors.BeforeSave(SaveKind.Create, null, newEvent);
+
+        // Assert
+        result.AssertError("Sold vehicles are read-only.");
+    }
+
+    [Fact]
+    public void EventBehaviors_CreateSoldVehicleArchivesCar()
+    {
+        // Arrange
+        var ownCar = CreateCar(UserAId);
+        var eventType = CreateEventType(
+            "Sold Vehicle",
+            """
+            {
+              "fields": [
+                { "name": "saleDate", "label": "Sale Date", "type": "date", "required": true }
+              ]
+            }
+            """);
+        RefreshServices();
+
+        SetCurrentUser(UserAId);
+        var behaviors = Mocker.CreateInstance<Event.EventBehaviors>();
+        var newEvent = new Event
+        {
+            CarId = ownCar.CarId,
+            EventTypeId = eventType.EventTypeDefinitionId,
+            JsonData = """{"saleDate":"2026-06-27"}""",
+        };
+
+        // Act
+        var result = behaviors.BeforeSave(SaveKind.Create, null, newEvent);
+
+        // Assert
+        result.AssertSuccess();
+        Assert.True(Db.Cars.Single(c => c.CarId == ownCar.CarId).IsArchived);
+    }
+
+    [Fact]
+    public void EventBehaviors_CreateValidatesJsonDefinitionRequiredFields()
+    {
+        // Arrange
+        var ownCar = CreateCar(UserAId);
+        var eventType = CreateEventType(
+            jsonDefinition:
+            """
+            {
+              "fields": [
+                { "name": "partName", "label": "Part Name", "type": "text", "required": true }
+              ]
+            }
+            """);
+        RefreshServices();
+
+        SetCurrentUser(UserAId);
+        var behaviors = Mocker.CreateInstance<Event.EventBehaviors>();
+        var newEvent = new Event
+        {
+            CarId = ownCar.CarId,
+            EventTypeId = eventType.EventTypeDefinitionId,
+            JsonData = "{}",
+        };
+
+        // Act
+        var result = behaviors.BeforeSave(SaveKind.Create, null, newEvent);
+
+        // Assert
+        result.AssertError("Part Name is required.");
+    }
+
+    [Fact]
+    public void EventBehaviors_CreateValidatesJsonDefinitionOptions()
+    {
+        // Arrange
+        var ownCar = CreateCar(UserAId);
+        var eventType = CreateEventType(
+            "Fuel Fill Up",
+            """
+            {
+              "fields": [
+                { "name": "fuelType", "label": "Fuel Type", "type": "select", "required": true, "options": ["Gasoline", "Diesel"] }
+              ]
+            }
+            """);
+        RefreshServices();
+
+        SetCurrentUser(UserAId);
+        var behaviors = Mocker.CreateInstance<Event.EventBehaviors>();
+        var newEvent = new Event
+        {
+            CarId = ownCar.CarId,
+            EventTypeId = eventType.EventTypeDefinitionId,
+            JsonData = """{"fuelType":"Electric"}""",
+        };
+
+        // Act
+        var result = behaviors.BeforeSave(SaveKind.Create, null, newEvent);
+
+        // Assert
+        result.AssertError("Fuel Type must be one of: Gasoline, Diesel.");
+    }
+
+    [Fact]
     public void EventBehaviors_DeleteDeniedForOtherUsersCar()
     {
         // Arrange
@@ -124,6 +247,30 @@ public class EventOwnershipTests : TestBase
 
         // Assert
         result.AssertError("You can only delete events for your own cars.");
+    }
+
+    [Fact]
+    public void EventBehaviors_DeleteDeniedForArchivedCar()
+    {
+        // Arrange
+        var ownArchivedCar = CreateCar(UserAId, isArchived: true);
+        var eventType = CreateEventType();
+        RefreshServices();
+
+        SetCurrentUser(UserAId);
+        var behaviors = Mocker.CreateInstance<Event.EventBehaviors>();
+        var existingEvent = new Event
+        {
+            CarId = ownArchivedCar.CarId,
+            EventTypeId = eventType.EventTypeDefinitionId,
+            JsonData = "{}",
+        };
+
+        // Act
+        var result = behaviors.BeforeDelete(existingEvent);
+
+        // Assert
+        result.AssertError("Sold vehicles are read-only.");
     }
 
     [Fact]
@@ -187,6 +334,33 @@ public class EventOwnershipTests : TestBase
         Assert.InRange(copiedEvent.CreateDate, beforeCopy, afterCopy);
         Assert.InRange(copiedEvent.ModifiedDate, beforeCopy, afterCopy);
         Assert.Equal(2, Db.Events.Count(e => e.CarId == ownCar.CarId));
+    }
+
+    [Fact]
+    public async Task EventService_CopyEventToTodayAsync_DeniesArchivedCar()
+    {
+        // Arrange
+        var ownArchivedCar = CreateCar(UserAId, isArchived: true);
+        var eventType = CreateEventType();
+        var existingEvent = new Event
+        {
+            CarId = ownArchivedCar.CarId,
+            EventTypeId = eventType.EventTypeDefinitionId,
+            JsonData = "{}",
+        };
+        Db.Events.Add(existingEvent);
+        Db.SaveChanges();
+        RefreshServices();
+
+        SetCurrentUser(UserAId);
+        var service = Mocker.CreateInstance<EventService>();
+
+        // Act
+        var result = await service.CopyEventToTodayAsync(CurrentUser, existingEvent.Id);
+
+        // Assert
+        result.AssertError("Sold vehicles are read-only.");
+        Assert.Single(Db.Events.Where(e => e.CarId == ownArchivedCar.CarId));
     }
 
     [Fact]

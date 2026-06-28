@@ -1,7 +1,12 @@
 <template>
   <v-container class="pa-6">
     <v-card v-if="car">
-      <v-card-title> {{ car.make }} {{ car.model }} </v-card-title>
+      <v-card-title class="d-flex flex-wrap align-center ga-2">
+        <span>{{ car.make }} {{ car.model }}</span>
+        <v-chip v-if="car.isArchived" color="info" size="small" variant="tonal">
+          Archived
+        </v-chip>
+      </v-card-title>
       <v-card-subtitle> Year: {{ car.year }} </v-card-subtitle>
       <v-card-text>
         <p>
