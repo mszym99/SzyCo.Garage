@@ -33,7 +33,7 @@ namespace SzyCo.Garage.Web.Api
         }
 
         [HttpGet("get/{id}")]
-        [Authorize]
+        [Authorize(Roles = "UserAdmin")]
         public virtual Task<ItemResult<RoleResponse>> Get(
             string id,
             [FromQuery] DataSourceParameters parameters,
@@ -41,14 +41,14 @@ namespace SzyCo.Garage.Web.Api
             => GetImplementation(id, parameters, dataSource);
 
         [HttpGet("list")]
-        [Authorize]
+        [Authorize(Roles = "UserAdmin")]
         public virtual Task<ListResult<RoleResponse>> List(
             [FromQuery] ListParameters parameters,
             IDataSource<SzyCo.Garage.Data.Models.Role> dataSource)
             => ListImplementation(parameters, dataSource);
 
         [HttpGet("count")]
-        [Authorize]
+        [Authorize(Roles = "UserAdmin")]
         public virtual Task<ItemResult<int>> Count(
             [FromQuery] FilterParameters parameters,
             IDataSource<SzyCo.Garage.Data.Models.Role> dataSource)
@@ -75,7 +75,7 @@ namespace SzyCo.Garage.Web.Api
             => SaveImplementation(dto, parameters, dataSource, behaviors);
 
         [HttpPost("bulkSave")]
-        [Authorize]
+        [Authorize(Roles = "UserAdmin")]
         public virtual Task<ItemResult<RoleResponse>> BulkSave(
             [FromBody] BulkSaveRequest dto,
             [FromQuery] DataSourceParameters parameters,
