@@ -25,11 +25,11 @@ namespace SzyCo.Garage.Web.Api
     [ServiceFilter(typeof(IApiActionFilter))]
     public partial class EventServiceController : BaseApiController
     {
-        protected SzyCo.Garage.Data.Services.EventService Service { get; }
+        protected SzyCo.Garage.Data.Services.IEventService Service { get; }
 
-        public EventServiceController(CrudContext context, SzyCo.Garage.Data.Services.EventService service) : base(context)
+        public EventServiceController(CrudContext context, SzyCo.Garage.Data.Services.IEventService service) : base(context)
         {
-            GeneratedForClassViewModel = context.ReflectionRepository.GetClassViewModel<SzyCo.Garage.Data.Services.EventService>();
+            GeneratedForClassViewModel = context.ReflectionRepository.GetClassViewModel<SzyCo.Garage.Data.Services.IEventService>();
             Service = service;
         }
 

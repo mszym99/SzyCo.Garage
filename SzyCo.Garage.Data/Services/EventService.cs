@@ -2,7 +2,13 @@ namespace SzyCo.Garage.Data.Services;
 
 [Coalesce]
 [Service]
-public class EventService
+public interface IEventService
+{
+    [Coalesce, Execute(HttpMethod = HttpMethod.Post)]
+    Task<ItemResult<Event>> CopyEventToTodayAsync(ClaimsPrincipal user, int eventId);
+}
+
+public class EventService : IEventService
 {
     private readonly AppDbContext _context;
 
@@ -19,7 +25,6 @@ public class EventService
         await _context.SaveChangesAsync();
     }
 
-    [Coalesce, Execute(HttpMethod = HttpMethod.Post)]
     public async Task<ItemResult<Event>> CopyEventToTodayAsync(ClaimsPrincipal user, int eventId)
     {
         var userId = user.GetUserId();

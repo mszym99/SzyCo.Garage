@@ -53,28 +53,6 @@ export const Permission = domain.enums.Permission = {
   },
   ]),
 }
-export const WidgetCategory = domain.enums.WidgetCategory = {
-  name: "WidgetCategory" as const,
-  displayName: "Widget Category",
-  type: "enum",
-  ...getEnumMeta<"Whizbangs"|"Sprecklesprockets"|"Discombobulators">([
-  {
-    value: 0,
-    strValue: "Whizbangs",
-    displayName: "Whizbangs",
-  },
-  {
-    value: 1,
-    strValue: "Sprecklesprockets",
-    displayName: "Sprecklesprockets",
-  },
-  {
-    value: 2,
-    strValue: "Discombobulators",
-    displayName: "Discombobulators",
-  },
-  ]),
-}
 export const AuditLog = domain.types.AuditLog = {
   name: "AuditLog" as const,
   displayName: "Audit Log",
@@ -873,113 +851,6 @@ export const UserRole = domain.types.UserRole = {
     },
   },
 }
-export const Widget = domain.types.Widget = {
-  name: "Widget" as const,
-  displayName: "Widget",
-  description: "A sample model provided by the Coalesce template. Remove this when you start building your real data model.",
-  get displayProp() { return this.props.name }, 
-  type: "model",
-  controllerRoute: "Widget",
-  get keyProp() { return this.props.widgetId }, 
-  behaviorFlags: 7 as BehaviorFlags,
-  props: {
-    widgetId: {
-      name: "widgetId",
-      displayName: "Widget Id",
-      type: "number",
-      role: "primaryKey",
-      hidden: 3 as HiddenAreas,
-    },
-    name: {
-      name: "name",
-      displayName: "Name",
-      type: "string",
-      role: "value",
-      rules: {
-        required: val => (val != null && val !== '') || "Name is required.",
-      }
-    },
-    category: {
-      name: "category",
-      displayName: "Category",
-      type: "enum",
-      get typeDef() { return WidgetCategory },
-      role: "value",
-      rules: {
-        required: val => val != null || "Category is required.",
-      }
-    },
-    inventedOn: {
-      name: "inventedOn",
-      displayName: "Invented On",
-      type: "date",
-      dateKind: "datetime",
-      role: "value",
-    },
-    modifiedById: {
-      name: "modifiedById",
-      displayName: "Modified By Id",
-      type: "string",
-      role: "foreignKey",
-      get principalKey() { return (domain.types.User as ModelType & { name: "User" }).props.id as PrimaryKeyProperty },
-      get principalType() { return (domain.types.User as ModelType & { name: "User" }) },
-      get navigationProp() { return (domain.types.Widget as ModelType & { name: "Widget" }).props.modifiedBy as ModelReferenceNavigationProperty },
-      hidden: 3 as HiddenAreas,
-      dontSerialize: true,
-    },
-    createdById: {
-      name: "createdById",
-      displayName: "Created By Id",
-      type: "string",
-      role: "foreignKey",
-      get principalKey() { return (domain.types.User as ModelType & { name: "User" }).props.id as PrimaryKeyProperty },
-      get principalType() { return (domain.types.User as ModelType & { name: "User" }) },
-      get navigationProp() { return (domain.types.Widget as ModelType & { name: "Widget" }).props.createdBy as ModelReferenceNavigationProperty },
-      hidden: 3 as HiddenAreas,
-      dontSerialize: true,
-    },
-    createdBy: {
-      name: "createdBy",
-      displayName: "Created By",
-      type: "model",
-      get typeDef() { return (domain.types.User as ModelType & { name: "User" }) },
-      role: "referenceNavigation",
-      get foreignKey() { return (domain.types.Widget as ModelType & { name: "Widget" }).props.createdById as ForeignKeyProperty },
-      get principalKey() { return (domain.types.User as ModelType & { name: "User" }).props.id as PrimaryKeyProperty },
-      dontSerialize: true,
-    },
-    createdOn: {
-      name: "createdOn",
-      displayName: "Created On",
-      type: "date",
-      dateKind: "datetime",
-      role: "value",
-      dontSerialize: true,
-    },
-    modifiedBy: {
-      name: "modifiedBy",
-      displayName: "Modified By",
-      type: "model",
-      get typeDef() { return (domain.types.User as ModelType & { name: "User" }) },
-      role: "referenceNavigation",
-      get foreignKey() { return (domain.types.Widget as ModelType & { name: "Widget" }).props.modifiedById as ForeignKeyProperty },
-      get principalKey() { return (domain.types.User as ModelType & { name: "User" }).props.id as PrimaryKeyProperty },
-      dontSerialize: true,
-    },
-    modifiedOn: {
-      name: "modifiedOn",
-      displayName: "Modified On",
-      type: "date",
-      dateKind: "datetime",
-      role: "value",
-      dontSerialize: true,
-    },
-  },
-  methods: {
-  },
-  dataSources: {
-  },
-}
 export const UserInfo = domain.types.UserInfo = {
   name: "UserInfo" as const,
   displayName: "User Info",
@@ -1033,14 +904,6 @@ export const UserInfo = domain.types.UserInfo = {
       },
       role: "value",
     },
-  },
-}
-export const CarService = domain.services.CarService = {
-  name: "CarService",
-  displayName: "Car Service",
-  type: "service",
-  controllerRoute: "CarService",
-  methods: {
   },
 }
 export const EventService = domain.services.EventService = {
@@ -1100,7 +963,6 @@ interface AppDomain extends Domain {
   enums: {
     AuditEntryState: typeof AuditEntryState
     Permission: typeof Permission
-    WidgetCategory: typeof WidgetCategory
   }
   types: {
     AuditLog: typeof AuditLog
@@ -1112,10 +974,8 @@ interface AppDomain extends Domain {
     User: typeof User
     UserInfo: typeof UserInfo
     UserRole: typeof UserRole
-    Widget: typeof Widget
   }
   services: {
-    CarService: typeof CarService
     EventService: typeof EventService
     SecurityService: typeof SecurityService
   }
