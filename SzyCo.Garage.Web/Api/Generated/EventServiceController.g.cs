@@ -32,5 +32,72 @@ namespace SzyCo.Garage.Web.Api
             GeneratedForClassViewModel = context.ReflectionRepository.GetClassViewModel<SzyCo.Garage.Data.Services.EventService>();
             Service = service;
         }
+
+        /// <summary>
+        /// Method: CopyEventToTodayAsync
+        /// </summary>
+        [HttpPost("CopyEventToToday")]
+        [HttpPost("CopyEventToTodayAsync")]
+        [Authorize]
+        [Consumes("application/x-www-form-urlencoded", "multipart/form-data")]
+        public virtual async Task<ItemResult<EventResponse>> CopyEventToToday(
+            [FromForm(Name = "eventId")] int eventId)
+        {
+            var _params = new
+            {
+                EventId = eventId
+            };
+
+            if (Context.Options.ValidateAttributesForMethods)
+            {
+                var _validationResult = ItemResult.FromParameterValidation(
+                    GeneratedForClassViewModel!.MethodByName("CopyEventToTodayAsync"), _params, HttpContext.RequestServices);
+                if (!_validationResult.WasSuccessful) return new ItemResult<EventResponse>(_validationResult);
+            }
+
+            IncludeTree includeTree = null;
+            var _mappingContext = new MappingContext(Context);
+            var _methodResult = await Service.CopyEventToTodayAsync(
+                User,
+                _params.EventId
+            );
+            var _result = new ItemResult<EventResponse>(_methodResult);
+            _result.Object = Mapper.MapToDto<SzyCo.Garage.Data.Models.Event, EventResponse>(_methodResult.Object, _mappingContext, includeTree ?? _methodResult.IncludeTree);
+            return _result;
+        }
+
+        public class CopyEventToTodayParameters
+        {
+            public int EventId { get; set; }
+        }
+
+        /// <summary>
+        /// Method: CopyEventToTodayAsync
+        /// </summary>
+        [HttpPost("CopyEventToToday")]
+        [HttpPost("CopyEventToTodayAsync")]
+        [Authorize]
+        [Consumes("application/json")]
+        public virtual async Task<ItemResult<EventResponse>> CopyEventToToday(
+            [FromBody] CopyEventToTodayParameters _params
+        )
+        {
+            if (Context.Options.ValidateAttributesForMethods)
+            {
+                var _validationResult = ItemResult.FromParameterValidation(
+                    GeneratedForClassViewModel!.MethodByName("CopyEventToTodayAsync"), _params, HttpContext.RequestServices);
+                if (!_validationResult.WasSuccessful) return new ItemResult<EventResponse>(_validationResult);
+            }
+
+            IncludeTree includeTree = null;
+            var _mappingContext = new MappingContext(Context);
+            var _methodResult = await Service.CopyEventToTodayAsync(
+                User,
+                _params.EventId
+            );
+            var _result = new ItemResult<EventResponse>(_methodResult);
+            _result.Object = Mapper.MapToDto<SzyCo.Garage.Data.Models.Event, EventResponse>(_methodResult.Object, _mappingContext, includeTree ?? _methodResult.IncludeTree);
+            return _result;
+        }
     }
 }

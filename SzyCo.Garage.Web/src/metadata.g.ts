@@ -1033,6 +1033,27 @@ export const EventService = domain.services.EventService = {
   type: "service",
   controllerRoute: "EventService",
   methods: {
+    copyEventToToday: {
+      name: "copyEventToToday",
+      displayName: "Copy Event To Today",
+      transportType: "item",
+      httpMethod: "POST",
+      params: {
+        eventId: {
+          name: "eventId",
+          displayName: "Event Id",
+          type: "number",
+          role: "value",
+        },
+      },
+      return: {
+        name: "$return",
+        displayName: "Result",
+        type: "model",
+        get typeDef() { return (domain.types.Event as ModelType & { name: "Event" }) },
+        role: "value",
+      },
+    },
   },
 }
 export const SecurityService = domain.services.SecurityService = {

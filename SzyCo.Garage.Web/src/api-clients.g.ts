@@ -83,6 +83,14 @@ export class CarServiceApiClient extends ServiceApiClient<typeof $metadata.CarSe
 
 export class EventServiceApiClient extends ServiceApiClient<typeof $metadata.EventService> {
   constructor() { super($metadata.EventService) }
+  public copyEventToToday(eventId?: number | null, $config?: AxiosRequestConfig): AxiosPromise<ItemResult<$models.Event>> {
+    const $method = this.$metadata.methods.copyEventToToday
+    const $params =  {
+      eventId,
+    }
+    return this.$invoke($method, $params, $config)
+  }
+  
 }
 
 

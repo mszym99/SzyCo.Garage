@@ -1,5 +1,6 @@
 using IntelliTect.Coalesce;
 using IntelliTect.Coalesce.Models;
+using SzyCo.Garage.Data.Services;
 using SzyCo.Garage.Data.Auth;
 using System.Security.Claims;
 
@@ -147,5 +148,71 @@ public class EventOwnershipTests : TestBase
         // Assert
         Assert.Single(result);
         Assert.Equal(userACar.CarId, result[0].CarId);
+    }
+
+    [Fact]
+    public async Task EventService_CopyEventToTodayAsync_CopiesOwnEvent()
+    {
+        // Arrange
+        var ownCar = CreateCar(UserAId);
+        var eventType = CreateEventType();
+        var originalCreateDate = DateTime.UtcNow.AddDays(-30);
+        var existingEvent = new Event
+        {
+            CarId = ownCar.CarId,
+            EventTypeId = eventType.EventTypeDefinitionId,
+            JsonData = """{"partName":"Battery","cost":"120"}""",
+            CreateDate = originalCreateDate,
+            ModifiedDate = originalCreateDate,
+        };
+        Db.Events.Add(existingEvent);
+        Db.SaveChanges();
+        RefreshServices();
+
+        SetCurrentUser(UserAId);
+        var service = Mocker.CreateInstance<EventService>();
+        var beforeCopy = DateTime.UtcNow;
+
+        // Act
+        var result = await service.CopyEventToTodayAsync(CurrentUser, existingEvent.Id);
+
+        // Assert
+        var copiedEvent = result.AssertSuccess();
+        var afterCopy = DateTime.UtcNow;
+
+        Assert.NotEqual(existingEvent.Id, copiedEvent.Id);
+        Assert.Equal(existingEvent.CarId, copiedEvent.CarId);
+        Assert.Equal(existingEvent.EventTypeId, copiedEvent.EventTypeId);
+        Assert.Equal(existingEvent.JsonData, copiedEvent.JsonData);
+        Assert.InRange(copiedEvent.CreateDate, beforeCopy, afterCopy);
+        Assert.InRange(copiedEvent.ModifiedDate, beforeCopy, afterCopy);
+        Assert.Equal(2, Db.Events.Count(e => e.CarId == ownCar.CarId));
+    }
+
+    [Fact]
+    public async Task EventService_CopyEventToTodayAsync_DeniesOtherUsersEvent()
+    {
+        // Arrange
+        var otherUsersCar = CreateCar(UserBId);
+        var eventType = CreateEventType();
+        var existingEvent = new Event
+        {
+            CarId = otherUsersCar.CarId,
+            EventTypeId = eventType.EventTypeDefinitionId,
+            JsonData = "{}",
+        };
+        Db.Events.Add(existingEvent);
+        Db.SaveChanges();
+        RefreshServices();
+
+        SetCurrentUser(UserAId);
+        var service = Mocker.CreateInstance<EventService>();
+
+        // Act
+        var result = await service.CopyEventToTodayAsync(CurrentUser, existingEvent.Id);
+
+        // Assert
+        result.AssertError("You can only copy events for your own cars.");
+        Assert.Single(Db.Events.Where(e => e.CarId == otherUsersCar.CarId));
     }
 }

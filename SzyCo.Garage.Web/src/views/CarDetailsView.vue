@@ -2,7 +2,7 @@
   <v-container class="pa-6">
     <div class="d-flex flex-wrap align-center ga-2 mb-4">
       <v-btn
-        prepend-icon="mdi-arrow-left"
+        prepend-icon="fa fa-arrow-left"
         color="primary"
         variant="outlined"
         @click="goBack"
@@ -10,9 +10,27 @@
         Back to Car List
       </v-btn>
 
-      <v-btn color="red" @click="removeCar">Remove Car</v-btn>
-      <v-btn color="secondary" @click="editDialog = true">Edit Car</v-btn>
-      <EventForm :car-list="carList" @saved="refreshEvents" />
+      <v-btn
+        prepend-icon="fa fa-trash"
+        color="error"
+        variant="tonal"
+        @click="removeCar"
+      >
+        Remove Car
+      </v-btn>
+      <v-btn
+        prepend-icon="fa fa-pencil"
+        color="secondary"
+        variant="tonal"
+        @click="editDialog = true"
+      >
+        Edit Car
+      </v-btn>
+      <EventForm
+        :car-list="carList"
+        :default-car-id="carId"
+        @saved="handleEventSaved('Event added.')"
+      />
     </div>
     <h2 class="text-h5 mb-4">Car Details</h2>
     <CarHero
@@ -36,16 +54,64 @@
     </v-card>
     <v-timeline v-else side="end" density="compact">
       <v-timeline-item
-        v-for="event in eventList.$items"
+        v-for="event in sortedEvents"
         :key="event.id!"
         size="small"
         dot-color="primary"
       >
         <v-card variant="outlined" class="mb-2">
-          <v-card-title class="text-subtitle-1">
-            {{ event.eventTypeDefinition?.name || "Event" }}
+          <v-card-title class="event-card-header text-subtitle-1">
+            <span class="event-card-name">
+              {{ event.eventTypeDefinition?.name || "Event" }}
+            </span>
+            <v-menu location="bottom end">
+              <template #activator="{ props: menuProps }">
+                <v-btn
+                  v-bind="menuProps"
+                  class="event-action-menu-button"
+                  icon="fa fa-ellipsis-v"
+                  size="small"
+                  variant="text"
+                  density="comfortable"
+                  title="Event actions"
+                  aria-label="Event actions"
+                />
+              </template>
+              <v-list class="event-action-menu" density="compact" min-width="190">
+                <EventForm
+                  :car-list="carList"
+                  :event="event"
+                  :default-car-id="carId"
+                  @saved="handleEventSaved('Event updated.')"
+                >
+                  <template #activator="{ props: activatorProps }">
+                    <v-list-item
+                      v-bind="activatorProps"
+                      prepend-icon="fa fa-pencil"
+                      title="Edit event"
+                    />
+                  </template>
+                </EventForm>
+                <v-list-item
+                  prepend-icon="fa fa-copy"
+                  :title="
+                    copyingEventId === event.id
+                      ? 'Copying...'
+                      : 'Copy to today'
+                  "
+                  :disabled="copyingEventId === event.id"
+                  @click="copyEvent(event)"
+                />
+                <v-list-item
+                  class="event-action-menu-item-delete"
+                  prepend-icon="fa fa-trash"
+                  title="Delete event"
+                  @click="removeEvent(event)"
+                />
+              </v-list>
+            </v-menu>
           </v-card-title>
-          <v-card-subtitle>
+          <v-card-subtitle class="event-card-date">
             {{ formatDate(event.createDate) }}
           </v-card-subtitle>
           <v-card-text v-if="getParsedEventData(event)">
@@ -93,7 +159,23 @@
           <v-btn variant="text" @click="confirmDeleteDialog = false"
             >Cancel</v-btn
           >
-          <v-btn color="red" @click="confirmRemoveCar">Yes, Delete</v-btn>
+          <v-btn color="error" @click="confirmRemoveCar">Yes, Delete</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <v-dialog v-model="confirmEventDeleteDialog" width="400">
+      <v-card>
+        <v-card-title class="text-h6">Confirm Deletion</v-card-title>
+        <v-card-text>
+          Are you sure you want to remove {{ eventPendingDeleteName }}?
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn variant="text" @click="confirmEventDeleteDialog = false">
+            Cancel
+          </v-btn>
+          <v-btn color="error" @click="confirmRemoveEvent">Yes, Delete</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -110,6 +192,7 @@ import {
   CarViewModel,
   EventViewModel,
   EventListViewModel,
+  EventServiceViewModel,
 } from "@/viewmodels.g";
 
 const route = useRoute();
@@ -119,6 +202,9 @@ const carId = Number(route.params.id);
 const editDialog = ref(false);
 const editCar = ref<CarViewModel>(new CarViewModel());
 const carRefreshKey = ref(0);
+const copyingEventId = ref<number | null>(null);
+const confirmEventDeleteDialog = ref(false);
+const eventPendingDelete = ref<EventViewModel | null>(null);
 const snackbar = ref({
   show: false,
   message: "",
@@ -127,6 +213,7 @@ const snackbar = ref({
 
 const carList = new CarListViewModel();
 const eventList = new EventListViewModel();
+const eventService = new EventServiceViewModel();
 const car = ref<CarViewModel>(new CarViewModel());
 const parsedEventDataCache = ref(
   new WeakMap<object, Record<string, string> | null>(),
@@ -134,6 +221,18 @@ const parsedEventDataCache = ref(
 
 const totalEventHistoryCost = computed(() =>
   formatCurrency(car.value.totalEventHistoryCost ?? 0),
+);
+
+const sortedEvents = computed(() =>
+  [...eventList.$items].sort((a, b) => {
+    const bTime = b.createDate ? new Date(b.createDate).getTime() : 0;
+    const aTime = a.createDate ? new Date(a.createDate).getTime() : 0;
+    return bTime - aTime;
+  }),
+);
+
+const eventPendingDeleteName = computed(
+  () => eventPendingDelete.value?.eventTypeDefinition?.name ?? "this event",
 );
 
 function goBack() {
@@ -207,9 +306,7 @@ async function submitEdit() {
   await editCar.value.$load();
   carRefreshKey.value += 1;
   editDialog.value = false;
-  snackbar.value.message = "Car updated!";
-  snackbar.value.color = "success";
-  snackbar.value.show = true;
+  showSnackbar("Car updated!");
 }
 
 async function refreshEvents() {
@@ -218,6 +315,60 @@ async function refreshEvents() {
     Record<string, string> | null
   >();
   await Promise.all([eventList.$load(), car.value.$load()]);
+}
+
+async function handleEventSaved(message: string) {
+  await refreshEvents();
+  showSnackbar(message);
+}
+
+async function copyEvent(event: EventViewModel) {
+  if (event.id == null) {
+    showSnackbar("Event is missing.", "error");
+    return;
+  }
+
+  try {
+    copyingEventId.value = event.id;
+    await eventService.copyEventToToday(event.id);
+    await refreshEvents();
+    showSnackbar("Event copied to today.");
+  } catch (error) {
+    console.error("Error copying event:", error);
+    showSnackbar("Failed to copy event. Please try again.", "error");
+  } finally {
+    copyingEventId.value = null;
+  }
+}
+
+function removeEvent(event: EventViewModel) {
+  eventPendingDelete.value = event;
+  confirmEventDeleteDialog.value = true;
+}
+
+async function confirmRemoveEvent() {
+  const eventId = eventPendingDelete.value?.id;
+  if (eventId == null) return;
+
+  try {
+    const event = new EventViewModel();
+    event.id = eventId;
+    await event.$delete();
+
+    confirmEventDeleteDialog.value = false;
+    eventPendingDelete.value = null;
+    await refreshEvents();
+    showSnackbar("Event removed.");
+  } catch (error) {
+    console.error("Error deleting event:", error);
+    showSnackbar("Failed to remove event. Please try again.", "error");
+  }
+}
+
+function showSnackbar(message: string, color = "success") {
+  snackbar.value.message = message;
+  snackbar.value.color = color;
+  snackbar.value.show = true;
 }
 
 const confirmDeleteDialog = ref(false);
@@ -246,15 +397,41 @@ async function confirmRemoveCar() {
     await car.$delete();
 
     confirmDeleteDialog.value = false;
-    snackbar.value.message = "Car removed.";
-    snackbar.value.color = "success";
-    snackbar.value.show = true;
+    showSnackbar("Car removed.");
     router.back();
   } catch (error) {
     console.error("Error deleting car:", error);
-    snackbar.value.message = "Failed to remove car. Please try again.";
-    snackbar.value.color = "error";
-    snackbar.value.show = true;
+    showSnackbar("Failed to remove car. Please try again.", "error");
   }
 }
 </script>
+
+<style scoped>
+.event-card-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+  padding-bottom: 0;
+  white-space: normal;
+}
+
+.event-card-name {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.event-card-date {
+  padding-top: 2px;
+}
+
+.event-action-menu-button {
+  flex: 0 0 auto;
+}
+
+.event-action-menu-item-delete {
+  color: rgb(var(--v-theme-error));
+}
+</style>

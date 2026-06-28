@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.Mvc;
 using SzyCo.Garage.Data.Communication;
+using SzyCo.Garage.Data.Services;
 
 var builder = WebApplication.CreateBuilder(new WebApplicationOptions
 {
@@ -78,6 +79,8 @@ services.AddSwaggerGen(c =>
     c.SwaggerDoc("current", new OpenApiInfo { Title = "Current API", Version = "current" });
 });
 
+services.AddScoped<CarService>();
+services.AddScoped<EventService>();
 services.AddScoped<SecurityService>();
 
 // Register IUrlHelper to allow for invite link generation.

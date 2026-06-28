@@ -318,6 +318,17 @@ export class CarServiceViewModel extends ServiceViewModel<typeof $metadata.CarSe
 
 export class EventServiceViewModel extends ServiceViewModel<typeof $metadata.EventService, $apiClients.EventServiceApiClient> {
   
+  public get copyEventToToday() {
+    const copyEventToToday = this.$apiClient.$makeCaller(
+      this.$metadata.methods.copyEventToToday,
+      (c, eventId?: number | null) => c.copyEventToToday(eventId),
+      () => ({eventId: null as number | null, }),
+      (c, args) => c.copyEventToToday(args.eventId))
+    
+    Object.defineProperty(this, 'copyEventToToday', {value: copyEventToToday});
+    return copyEventToToday
+  }
+  
   constructor() {
     super($metadata.EventService, new $apiClients.EventServiceApiClient())
   }

@@ -8,7 +8,7 @@
     "build": "vite build && vue-tsc --noEmit",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "test": "vitest",
+    "test": "vitest run --dir src",
     "coverage": "vitest run --coverage",
     "coalesce": "dotnet coalesce"
   },

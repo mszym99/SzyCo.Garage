@@ -43,4 +43,27 @@ describe("CarDetailsView.vue", () => {
     expect(carDetailsViewSource).toContain(':refresh-key="carRefreshKey"');
     expect(carDetailsViewSource).toContain("carRefreshKey.value += 1");
   });
+
+  it("exposes edit, copy, and delete actions for events", () => {
+    expect(carDetailsViewSource).toContain(':event="event"');
+    expect(carDetailsViewSource).toContain("event-action-menu");
+    expect(carDetailsViewSource).toContain('icon="fa fa-ellipsis-v"');
+    expect(carDetailsViewSource).toContain('prepend-icon="fa fa-pencil"');
+    expect(carDetailsViewSource).toContain('prepend-icon="fa fa-copy"');
+    expect(carDetailsViewSource).toContain('prepend-icon="fa fa-trash"');
+    expect(carDetailsViewSource).toContain('title="Edit event"');
+    expect(carDetailsViewSource).toContain("Copy to today");
+    expect(carDetailsViewSource).toContain('title="Delete event"');
+    expect(carDetailsViewSource).toContain("confirmRemoveEvent");
+  });
+
+  it("copies an event as a new event for today", () => {
+    expect(carDetailsViewSource).toContain("async function copyEvent");
+    expect(carDetailsViewSource).toContain("EventServiceViewModel");
+    expect(carDetailsViewSource).toContain("const eventService = new EventServiceViewModel()");
+    expect(carDetailsViewSource).toContain(
+      "await eventService.copyEventToToday(event.id)",
+    );
+    expect(carDetailsViewSource).toContain("Event copied to today.");
+  });
 });
