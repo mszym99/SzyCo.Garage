@@ -71,16 +71,6 @@ export class UserRoleApiClient extends ModelApiClient<$models.UserRole> {
 }
 
 
-export class WidgetApiClient extends ModelApiClient<$models.Widget> {
-  constructor() { super($metadata.Widget) }
-}
-
-
-export class CarServiceApiClient extends ServiceApiClient<typeof $metadata.CarService> {
-  constructor() { super($metadata.CarService) }
-}
-
-
 export class EventServiceApiClient extends ServiceApiClient<typeof $metadata.EventService> {
   constructor() { super($metadata.EventService) }
   public copyEventToToday(eventId?: number | null, $config?: AxiosRequestConfig): AxiosPromise<ItemResult<$models.Event>> {

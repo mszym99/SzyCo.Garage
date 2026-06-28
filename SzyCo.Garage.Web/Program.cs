@@ -79,8 +79,8 @@ services.AddSwaggerGen(c =>
     c.SwaggerDoc("current", new OpenApiInfo { Title = "Current API", Version = "current" });
 });
 
-services.AddScoped<CarService>();
-services.AddScoped<EventService>();
+services.AddScoped<ICarService, CarService>();
+services.AddScoped<IEventService, EventService>();
 services.AddScoped<SecurityService>();
 
 // Register IUrlHelper to allow for invite link generation.

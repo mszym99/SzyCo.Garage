@@ -3,6 +3,7 @@ using System.ComponentModel;
 
 namespace SzyCo.Garage.Data.Models;
 
+[Read(AllowAuthenticated)]
 [Edit(AllowAuthenticated)]
 [Create(DenyAll)]
 [Delete(DenyAll)]
@@ -125,10 +126,11 @@ public class User : IdentityUser
             var query = base.GetQuery(parameters);
             if (User.Can(Permission.UserAdmin))
             {
-                query = query.Include(u => u.UserRoles!).ThenInclude(ur => ur.Role);
+                return query.Include(u => u.UserRoles!).ThenInclude(ur => ur.Role);
             }
 
-            return query;
+            var userId = User.GetUserId();
+            return query.Where(u => u.Id == userId);
         }
     }
 

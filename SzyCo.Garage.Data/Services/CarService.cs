@@ -1,8 +1,11 @@
 namespace SzyCo.Garage.Data.Services;
 
-[Service]
-[Coalesce]
-public class CarService
+public interface ICarService
+{
+    Task AddCarAsync(Car car);
+}
+
+public class CarService : ICarService
 {
     private readonly AppDbContext _context;
 

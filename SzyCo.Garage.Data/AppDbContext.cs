@@ -31,7 +31,6 @@ public class AppDbContext
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
     public DbSet<AuditLogProperty> AuditLogProperties => Set<AuditLogProperty>();
 
-    public DbSet<Widget> Widgets => Set<Widget>();
     public DbSet<Car> Cars => Set<Car>();
     public DbSet<Event> Events => Set<Event>();
     public DbSet<EventTypeDefinition> EventTypeDefinitions => Set<EventTypeDefinition>();

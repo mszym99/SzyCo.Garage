@@ -4,6 +4,7 @@ using System.ComponentModel;
 
 namespace SzyCo.Garage.Data.Models;
 
+[Read(nameof(Permission.UserAdmin))]
 [Create(nameof(Permission.UserAdmin))]
 [Edit(nameof(Permission.UserAdmin))]
 [Delete(nameof(Permission.UserAdmin))]
